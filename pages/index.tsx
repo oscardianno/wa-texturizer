@@ -8,8 +8,6 @@ const TERRAINS = [
 ]
 
 const IMAGE_PATHS = [
-  "test.png",
-  "shapes.png",
   ...TERRAINS.map(t => `Terrain/${t}/text.png`),
   ...TERRAINS.map(t => `Terrain/${t}/grass.png`),
 ];
@@ -187,7 +185,7 @@ export default function Home() {
   React.useEffect(() => {
     if (canvas && !_.isEmpty(images)) {
       _.defer(() => {
-        texturize(canvas, images["shapes.png"], images[`Terrain/${terrain}/text.png`], images[`Terrain/${terrain}/grass.png`], hexToRgb(maskColor));
+        texturize(canvas, sourceImage, images[`Terrain/${terrain}/text.png`], images[`Terrain/${terrain}/grass.png`], hexToRgb(maskColor));
       });
     }
   }, [terrain, canvas, sourceImage, images, maskColor]);
