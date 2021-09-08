@@ -173,7 +173,7 @@ export default function Home() {
   const [sourceImage, setSourceImage] = React.useState<HTMLImageElement>(null);
   const [terrain, setTerrain] = useQueryParam("terrain", "Art");
   const [maskColor, setMaskColor] = useQueryParam("maskColor", "#ffffff");
-  const [canvas, setCanvas] = React.useState();
+  const [canvas, setCanvas] = React.useState<HTMLCanvasElement>();
   const [images, setImages] = React.useState({});
 
   React.useEffect(() => {
@@ -183,7 +183,7 @@ export default function Home() {
   }, [])
 
   React.useEffect(() => {
-    if (canvas && !_.isEmpty(images)) {
+    if (canvas && sourceImage && !_.isEmpty(images)) {
       _.defer(() => {
         texturize(canvas, sourceImage, images[`Terrain/${terrain}/text.png`], images[`Terrain/${terrain}/grass.png`], hexToRgb(maskColor));
       });
