@@ -26,7 +26,7 @@ function _getCanvas(image: HTMLImageElement): HTMLCanvasElement {
 
 const getCanvas = _.memoize(_getCanvas);
 
-async function loadImages(imagePaths: string[]): Promise<{[path: string]: HTMLImageElement}> {
+async function loadImages(imagePaths: string[]): Promise<{ [path: string]: HTMLImageElement }> {
   const images = await Promise.all<HTMLImageElement>(imagePaths.map(path => new Promise((resolve) => {
     const img = new Image();
     img.addEventListener("load", () => resolve(img));
@@ -40,12 +40,12 @@ type Color = [r: number, g: number, b: number, a: number];
 
 function getPixel(imgData: ImageData, x: number, y: number): Color {
   const index = y * imgData.width + x;
-  return imgData.data.slice(index*4, index*4+4) as unknown as Color;
+  return imgData.data.slice(index * 4, index * 4 + 4) as unknown as Color;
 }
 
 function setPixel(imgData: ImageData, x: number, y: number, color: Color) {
   const index = y * imgData.width + x;
-  imgData.data.set(color, index*4)
+  imgData.data.set(color, index * 4)
 }
 
 function getContext(image: HTMLImageElement): CanvasRenderingContext2D {
@@ -102,7 +102,7 @@ function texturize(canvas: HTMLCanvasElement, sourceImage: HTMLImageElement, tex
 
   for (let x = 0; x < sourceImage.width; x++) {
     let below = grassImage.height - grassBottomOffset - 1;
-    for (let y = sourceImage.height - 1; y >= 0 ; y--) {
+    for (let y = sourceImage.height - 1; y >= 0; y--) {
       const sourceColor = getPixel(imageData, x, y);
       if (colorEqual(sourceColor, maskColor)) {
         let color: Color;
@@ -139,7 +139,7 @@ function texturize(canvas: HTMLCanvasElement, sourceImage: HTMLImageElement, tex
     }
   }
 
-  
+
   ctx.putImageData(newImageData, 0, 0);
 }
 
@@ -150,7 +150,7 @@ function useQueryParam(key: string, defaultValue?: string): [value: string, set:
     const params = new URLSearchParams(window.location.search);
     setValue(params.get(key) ?? defaultValue);
   }, []);
-  
+
   return [value, newValue => {
     setValue(newValue);
     const params = new URLSearchParams(window.location.search);
