@@ -1,22 +1,19 @@
-import Head from 'next/head';
+import Head from "next/head";
 import React from "react";
 import _ from "lodash";
 
-const TERRAINS = [
-  "Art",
-  "Desert"
-]
+const TERRAINS = ["Art", "Desert"];
 
 const IMAGE_PATHS = [
-  ...TERRAINS.map(t => `Terrain/${t}/text.png`),
-  ...TERRAINS.map(t => `Terrain/${t}/grass.png`),
+  ...TERRAINS.map((t) => `Terrain/${t}/text.png`),
+  ...TERRAINS.map((t) => `Terrain/${t}/grass.png`),
 ];
 
 const WHITE: Color = [255, 255, 255, 255];
 const BLACK: Color = [0, 0, 0, 255];
 
 function _getCanvas(image: HTMLImageElement): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = image.width;
   canvas.height = image.height;
@@ -26,12 +23,19 @@ function _getCanvas(image: HTMLImageElement): HTMLCanvasElement {
 
 const getCanvas = _.memoize(_getCanvas);
 
-async function loadImages(imagePaths: string[]): Promise<{ [path: string]: HTMLImageElement }> {
-  const images = await Promise.all<HTMLImageElement>(imagePaths.map(path => new Promise((resolve) => {
-    const img = new Image();
-    img.addEventListener("load", () => resolve(img));
-    img.src = path;
-  })));
+async function loadImages(
+  imagePaths: string[]
+): Promise<{ [path: string]: HTMLImageElement }> {
+  const images = await Promise.all<HTMLImageElement>(
+    imagePaths.map(
+      (path) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.addEventListener("load", () => resolve(img));
+          img.src = path;
+        })
+    )
+  );
 
   return _.zipObject(imagePaths, images);
 }
@@ -45,7 +49,7 @@ function getPixel(imgData: ImageData, x: number, y: number): Color {
 
 function setPixel(imgData: ImageData, x: number, y: number, color: Color) {
   const index = y * imgData.width + x;
-  imgData.data.set(color, index * 4)
+  imgData.data.set(color, index * 4);
 }
 
 function getContext(image: HTMLImageElement): CanvasRenderingContext2D {
@@ -67,22 +71,53 @@ function closeToBlack([r, g, b]: Color) {
 //     return dst;
 // }
 
-function texturize(canvas: HTMLCanvasElement, sourceImage: HTMLImageElement, textImage: HTMLImageElement, grassImage: HTMLImageElement, maskColor: Color) {
+function texturize(
+  canvas: HTMLCanvasElement,
+  sourceImage: HTMLImageElement,
+  textImage: HTMLImageElement,
+  grassImage: HTMLImageElement,
+  maskColor: Color
+) {
   const ctx = canvas.getContext("2d");
   canvas.width = sourceImage.width;
   canvas.height = sourceImage.height;
   ctx.drawImage(sourceImage, 0, 0);
 
-  const imageData = ctx.getImageData(0, 0, sourceImage.width, sourceImage.height);
-  const newImageData = ctx.getImageData(0, 0, sourceImage.width, sourceImage.height);
+  const imageData = ctx.getImageData(
+    0,
+    0,
+    sourceImage.width,
+    sourceImage.height
+  );
+  const newImageData = ctx.getImageData(
+    0,
+    0,
+    sourceImage.width,
+    sourceImage.height
+  );
 
   const textContext = getContext(textImage);
-  const textImageData = textContext.getImageData(0, 0, textImage.width, textImage.height);
+  const textImageData = textContext.getImageData(
+    0,
+    0,
+    textImage.width,
+    textImage.height
+  );
 
   const grassContext = getContext(grassImage);
   const grassWidth = 64;
-  const grassTopImageData = grassContext.getImageData(0, 0, grassWidth, grassImage.height);
-  const grassBottomImageData = grassContext.getImageData(grassWidth, 0, grassWidth, grassImage.height);
+  const grassTopImageData = grassContext.getImageData(
+    0,
+    0,
+    grassWidth,
+    grassImage.height
+  );
+  const grassBottomImageData = grassContext.getImageData(
+    grassWidth,
+    0,
+    grassWidth,
+    grassImage.height
+  );
 
   let grassTopOffset = 0;
   for (let y = 0; y < grassImage.height; y++) {
@@ -111,7 +146,11 @@ function texturize(canvas: HTMLCanvasElement, sourceImage: HTMLImageElement, tex
         }
 
         if (!color || closeToBlack(color)) {
-          color = getPixel(textImageData, x % textImage.width, y % textImage.height);
+          color = getPixel(
+            textImageData,
+            x % textImage.width,
+            y % textImage.height
+          );
         }
 
         setPixel(newImageData, x, y, color);
@@ -127,7 +166,11 @@ function texturize(canvas: HTMLCanvasElement, sourceImage: HTMLImageElement, tex
       const sourceColor = getPixel(imageData, x, y);
       if (colorEqual(sourceColor, maskColor)) {
         if (above < grassImage.height - grassTopOffset) {
-          const color = getPixel(grassTopImageData, x % grassWidth, above + grassTopOffset);
+          const color = getPixel(
+            grassTopImageData,
+            x % grassWidth,
+            above + grassTopOffset
+          );
           if (!closeToBlack(color)) {
             setPixel(newImageData, x, y, color);
           }
@@ -139,11 +182,13 @@ function texturize(canvas: HTMLCanvasElement, sourceImage: HTMLImageElement, tex
     }
   }
 
-
   ctx.putImageData(newImageData, 0, 0);
 }
 
-function useQueryParam(key: string, defaultValue?: string): [value: string, set: (value: string) => void] {
+function useQueryParam(
+  key: string,
+  defaultValue?: string
+): [value: string, set: (value: string) => void] {
   const [value, setValue] = React.useState<string>();
 
   React.useEffect(() => {
@@ -151,19 +196,22 @@ function useQueryParam(key: string, defaultValue?: string): [value: string, set:
     setValue(params.get(key) ?? defaultValue);
   }, []);
 
-  return [value, newValue => {
-    setValue(newValue);
-    const params = new URLSearchParams(window.location.search);
-    params.set(key, newValue);
-    window.history.replaceState({}, '', `${location.pathname}?${params}`);
-  }];
+  return [
+    value,
+    (newValue) => {
+      setValue(newValue);
+      const params = new URLSearchParams(window.location.search);
+      params.set(key, newValue);
+      window.history.replaceState({}, "", `${location.pathname}?${params}`);
+    },
+  ];
 }
 
 function hexToRgb(hex: string): Color {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (result) {
     const [match, r, g, b] = result;
-    return [...[r, g, b].map(s => parseInt(s, 16)), 255] as Color;
+    return [...[r, g, b].map((s) => parseInt(s, 16)), 255] as Color;
   } else {
     return null;
   }
@@ -180,12 +228,18 @@ export default function Home() {
     (async () => {
       setImages(await loadImages(IMAGE_PATHS));
     })();
-  }, [])
+  }, []);
 
   React.useEffect(() => {
     if (canvas && sourceImage && !_.isEmpty(images)) {
       _.defer(() => {
-        texturize(canvas, sourceImage, images[`Terrain/${terrain}/text.png`], images[`Terrain/${terrain}/grass.png`], hexToRgb(maskColor));
+        texturize(
+          canvas,
+          sourceImage,
+          images[`Terrain/${terrain}/text.png`],
+          images[`Terrain/${terrain}/grass.png`],
+          hexToRgb(maskColor)
+        );
       });
     }
   }, [terrain, canvas, sourceImage, images, maskColor]);
@@ -201,22 +255,34 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <input type="file" accept="image/*" onChange={e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.addEventListener("load", () => {
-          const img = new Image();
-          img.addEventListener("load", () => setSourceImage(img));
-          img.src = reader.result.toString();
-        })
-        reader.readAsDataURL(file);
-      }} />
-      <select value={terrain} onChange={e => setTerrain(e.target.value)}>
-        {TERRAINS.map(t => (<option key={t} value={t}>{t}</option>))}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          reader.addEventListener("load", () => {
+            const img = new Image();
+            img.addEventListener("load", () => setSourceImage(img));
+            img.src = reader.result.toString();
+          });
+          reader.readAsDataURL(file);
+        }}
+      />
+      <select value={terrain} onChange={(e) => setTerrain(e.target.value)}>
+        {TERRAINS.map((t) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
       </select>
-      <input type="color" value={maskColor} onChange={e => setMaskColor(e.target.value)} />
+      <input
+        type="color"
+        value={maskColor}
+        onChange={(e) => setMaskColor(e.target.value)}
+      />
       <br />
       <canvas key={terrain} ref={setCanvas} />
     </div>
-  )
+  );
 }
