@@ -333,6 +333,7 @@ export default function Home() {
       <input
         type="file"
         accept="image/*"
+        className="image-input"
         onChange={(e) => {
           const file = e.target.files[0];
           const reader = new FileReader();
