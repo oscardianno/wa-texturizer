@@ -12,18 +12,15 @@ const IMAGE_PATHS = [
   ...TERRAINS.map((t) => `Terrain/${t}/grass.png`),
 ];
 
+const MAX_GRASS_HEIGHT = 64;
 const WHITE: Color = [255, 255, 255, 255];
 const BLACK: Color = [0, 0, 0, 255];
 
-// Creates and returns the HTMLCanvasElement of a HTMLImageElement
+// Creates and returns a HTMLCanvasElement out of a HTMLImageElement
 function _getCanvas(image: HTMLImageElement): HTMLCanvasElement {
-  /* Creates and returns an object that provides methods and properties
-  for drawing and manipulating images and graphics on a canvas element
-  in a document. A context object includes information about colors,
-  line widths, fonts, and other graphic parameters that can be 
-  drawn on a canvas. */
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
+  // Draw the given image on the created canvas
   canvas.width = image.width;
   canvas.height = image.height;
   ctx.drawImage(image, 0, 0);
@@ -54,6 +51,7 @@ async function loadImages(
 }
 
 // Defines a type for the color of pixels. RGB + alpha
+// Each pixel is a 4-byte value - "RGBA" format
 type Color = [r: number, g: number, b: number, a: number];
 
 // Returns the color of a pixel in an ImageData
@@ -64,7 +62,7 @@ function getPixel(imgData: ImageData, x: number, y: number): Color {
   then we just sum the 'x' value. */
   const index = y * imgData.width + x;
   // Then we multiply the index * 4, because each color is made of 4 values
-  // RGBA, and we slice 4 elements to get the color.
+  // (RGBA), and we slice 4 elements to get the color.
   return imgData.data.slice(index * 4, index * 4 + 4) as unknown as Color;
 }
 
@@ -75,7 +73,7 @@ function setPixel(imgData: ImageData, x: number, y: number, color: Color) {
 }
 
 function getContext(image: HTMLImageElement): CanvasRenderingContext2D {
-  /* Creates and returns an object that provides methods and properties
+  /* Returns an object that provides methods and properties
   for drawing and manipulating images and graphics on a canvas element
   in a document. A context object includes information about colors,
   line widths, fonts, and other graphic parameters that can be 
@@ -118,6 +116,7 @@ function texturize(
   ctx.drawImage(sourceImage, 0, 0);
 
   // Get all the necessary imageData's
+  // "The ImageData object represents the underlying pixel data of an area of a canvas object"
   // sourceImage data
   const imageData = ctx.getImageData(
     0,
