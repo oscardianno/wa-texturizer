@@ -3,7 +3,24 @@ import React from "react";
 import _ from "lodash";
 
 // TERRAINS defines the terrain options that will be available through the app
-const TERRAINS = ["Art", "Desert"];
+const TERRAINS = [
+  "Art",
+  "Desert",
+  "Cheese",
+  "Construction",
+  "Easter",
+  "Forest",
+  "Fruit",
+  "Gulf",
+  "Hell",
+  "Hospital",
+  "Jungle",
+  "Manhattan",
+  "Medieval",
+  "Music",
+  "Pirate",
+  "Snow",
+];
 
 // IMAGE_PATHS stores the paths of the images needed for each terrain available
 // text.png for the texture and grass.png
