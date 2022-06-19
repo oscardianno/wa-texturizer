@@ -537,6 +537,7 @@ export default function Home() {
         />
         Resize map to valid W:A dimensions
       </label>
+      <br />
       {resizeOutput === 1 && (
         <div className="resize-options-div">
           <label className="options">
@@ -561,8 +562,6 @@ export default function Home() {
           </label>
         </div>
       )}
-      <br />
-      <br />
       <canvas key={terrain} ref={setCanvas} />
     </div>
   );
