@@ -20,6 +20,13 @@ const TERRAINS = [
   "Music",
   "Pirate",
   "Snow",
+  "Space",
+  "Sports",
+  "Tentacle",
+  "Time",
+  "Tools",
+  "Tribal",
+  "Urban",
 ];
 
 // IMAGE_PATHS stores the paths of the images needed for each terrain available
