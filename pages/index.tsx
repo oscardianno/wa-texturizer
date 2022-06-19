@@ -102,35 +102,52 @@ function closeToBlack([r, g, b]: Color) {
 //     return dst;
 // }
 
+function getPixelRow(imgData: ImageData, y: number): Color[] {
+  const rowLengthInBytes = imgData.width * 4;
+  const index = y * rowLengthInBytes;
+  return imgData.data.slice(index, index + rowLengthInBytes) as unknown as any;
+}
+
+function setPixelRow(
+  imgData: ImageData,
+  y: number,
+  row: Color[],
+  numberOfRows: number = 1
+) {
+  const rowLengthInBytes = imgData.width * 4;
+  for (let i = 0; i < numberOfRows; i++) {
+    imgData.data.set(row as any, (y + i) * rowLengthInBytes);
+  }
+}
+
 // Applies the selected terrain's texture/grass to the given sourceImage
 function texturize(
   canvas: HTMLCanvasElement,
   sourceImage: HTMLImageElement,
+  dontDrawGrassOnUpperBorder: number,
+  dontDrawGrassOnLowerBorder: number,
   textImage: HTMLImageElement,
   grassImage: HTMLImageElement,
   maskColor: Color
 ) {
+  const originalHeight = sourceImage.height;
+  const renderHeight =
+    originalHeight +
+    dontDrawGrassOnUpperBorder * MAX_GRASS_HEIGHT +
+    dontDrawGrassOnLowerBorder * MAX_GRASS_HEIGHT;
+  const heightOffset = dontDrawGrassOnUpperBorder * MAX_GRASS_HEIGHT;
+
   const ctx = canvas.getContext("2d");
   canvas.width = sourceImage.width;
-  canvas.height = sourceImage.height;
-  ctx.drawImage(sourceImage, 0, 0);
+  canvas.height = renderHeight;
+  ctx.drawImage(sourceImage, 0, heightOffset);
 
   // Get all the necessary imageData's
   // "The ImageData object represents the underlying pixel data of an area of a canvas object"
   // sourceImage data
-  const imageData = ctx.getImageData(
-    0,
-    0,
-    sourceImage.width,
-    sourceImage.height
-  );
+  const imageData = ctx.getImageData(0, 0, sourceImage.width, renderHeight);
   // generatedImage data
-  const newImageData = ctx.getImageData(
-    0,
-    0,
-    sourceImage.width,
-    sourceImage.height
-  );
+  const newImageData = ctx.getImageData(0, 0, sourceImage.width, renderHeight);
 
   // Texture
   const textContext = getContext(textImage);
@@ -176,12 +193,25 @@ function texturize(
     grassBottomOffset++;
   }
 
+  if (dontDrawGrassOnUpperBorder) {
+    // Copy and fill the upper gap of sourceImage with the first row of pixels
+    const firstPixelRow = getPixelRow(imageData, heightOffset);
+    setPixelRow(imageData, 0, firstPixelRow, MAX_GRASS_HEIGHT);
+  }
+
+  if (dontDrawGrassOnLowerBorder) {
+    // Copy and fill the lower gap of sourceImage with the last row of pixels
+    const y = originalHeight + heightOffset;
+    const lastPixelRow = getPixelRow(imageData, y - 1);
+    setPixelRow(imageData, y, lastPixelRow, MAX_GRASS_HEIGHT);
+  }
+
   // Texturization begins - scans horizontally in X from left to right
   for (let x = 0; x < sourceImage.width; x++) {
     // It applies grass from down to up, so position at the bottom pixel of the grass-bottom
     let below = grassImage.height - grassBottomOffset - 1;
     // Scan vertically in Y from down to up (to apply grassBottom)
-    for (let y = sourceImage.height - 1; y >= 0; y--) {
+    for (let y = renderHeight - 1; y >= 0; y--) {
       // Get the pixel color in x/y position of the sourceImage data
       const sourceColor = getPixel(imageData, x, y);
       // If color in pixel is maskColor, texturize it
@@ -192,7 +222,7 @@ function texturize(
         if (below >= 0) {
           // Texturize with grass-bottom
           // Get the pixel from grassBottom, x % grassWidth because it's treated
-          // as a pattern that that repeats itself.
+          // as a pattern that repeats itself.
           color = getPixel(grassBottomImageData, x % grassWidth, below);
         }
 
@@ -221,7 +251,7 @@ function texturize(
     // It applies grass from up to down, so position at the upper pixel of the grass-top
     let above = 0; // which is 0
     // Scan vertically in Y from up to down (to apply grassTop)
-    for (let y = 0; y < sourceImage.height; y++) {
+    for (let y = 0; y < renderHeight; y++) {
       const sourceColor = getPixel(imageData, x, y);
       if (colorEqual(sourceColor, maskColor)) {
         // 'above' increases as grass-top is applied (as if the height was filled)
@@ -249,6 +279,16 @@ function texturize(
   }
 
   ctx.putImageData(newImageData, 0, 0);
+  if (dontDrawGrassOnUpperBorder || dontDrawGrassOnLowerBorder) {
+    const croppedImageData = ctx.getImageData(
+      0,
+      heightOffset,
+      sourceImage.width,
+      originalHeight
+    );
+    canvas.height = originalHeight;
+    ctx.putImageData(croppedImageData, 0, 0);
+  }
 }
 
 // This function is used at the terrain & maskColor React states
@@ -292,6 +332,10 @@ export default function Home() {
   const [maskColor, setMaskColor] = useQueryParam("maskColor", "#ffffff");
   const [canvas, setCanvas] = React.useState<HTMLCanvasElement>();
   const [images, setImages] = React.useState({});
+  const [dontDrawGrassOnUpperBorder, SetDontDrawGrassOnUpperBorder] =
+    React.useState(0);
+  const [dontDrawGrassOnLowerBorder, SetDontDrawGrassOnLowerBorder] =
+    React.useState(0);
 
   React.useEffect(() => {
     (async () => {
@@ -310,13 +354,30 @@ export default function Home() {
         texturize(
           canvas,
           sourceImage,
+          dontDrawGrassOnUpperBorder,
+          dontDrawGrassOnLowerBorder,
           images[`Terrain/${terrain}/text.png`],
           images[`Terrain/${terrain}/grass.png`],
           hexToRgb(maskColor)
         );
       });
     }
-  }, [terrain, canvas, sourceImage, images, maskColor]);
+  }, [
+    terrain,
+    canvas,
+    sourceImage,
+    images,
+    maskColor,
+    dontDrawGrassOnUpperBorder,
+    dontDrawGrassOnLowerBorder,
+  ]);
+
+  const handleSetDontDrawGrassOnUpperBorder = (value: boolean) => {
+    SetDontDrawGrassOnUpperBorder(value ? 1 : 0);
+  };
+  const handleSetDontDrawGrassOnLowerBorder = (value: boolean) => {
+    SetDontDrawGrassOnLowerBorder(value ? 1 : 0);
+  };
 
   if (!terrain) {
     return null;
@@ -356,6 +417,31 @@ export default function Home() {
         value={maskColor}
         onChange={(e) => setMaskColor(e.target.value)}
       />
+      <br />
+      <label className="grass-checkbox">
+        <input
+          type="checkbox"
+          id="upper-border"
+          value={dontDrawGrassOnUpperBorder}
+          onChange={(e) =>
+            handleSetDontDrawGrassOnUpperBorder(e.target.checked)
+          }
+        />
+        Don't draw grass on top image border
+      </label>
+      <br />
+      <label className="grass-checkbox">
+        <input
+          type="checkbox"
+          id="lower-border"
+          value={dontDrawGrassOnLowerBorder}
+          onChange={(e) =>
+            handleSetDontDrawGrassOnLowerBorder(e.target.checked)
+          }
+        />
+        Don't draw grass on bottom image border
+      </label>
+      <br />
       <br />
       <canvas key={terrain} ref={setCanvas} />
     </div>
