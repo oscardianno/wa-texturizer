@@ -2,12 +2,22 @@ html {
     background-color: #333333;
 }
 
-.image-input {
-    color: white;
-}
-
-.grass-checkbox {
+.options {
     color: white;
     font-family: Arial, Helvetica, sans-serif;
     font-size: small;
+}
+
+.options.or {
+    margin-top: 12px;
+    margin-left: 20px;
+    margin-bottom: 0px;
+}
+
+.resize-options-div {
+    margin-left: 32px;
+}
+
+.color-input {
+    margin-left: 8px;
 }

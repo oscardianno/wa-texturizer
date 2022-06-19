@@ -43,6 +43,8 @@ const IMAGE_PATHS = [
 ];
 
 const MAX_GRASS_HEIGHT = 64;
+const MIN_MAP_WIDTH = 640;
+const MIN_MAP_HEIGHT = 32;
 const WHITE: Color = [255, 255, 255, 255];
 const BLACK: Color = [0, 0, 0, 255];
 
@@ -321,6 +323,41 @@ function texturize(
   }
 }
 
+function findNextValidDimension(n: number): number {
+  while (n % 8 != 0) {
+    n++;
+  }
+  return n;
+}
+
+function resize(
+  canvas: HTMLCanvasElement,
+  transparentBackground: boolean,
+  backgroundColor: string
+) {
+  const ctx = canvas.getContext("2d");
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const originalWidth = canvas.width;
+  const originalHeight = canvas.height;
+
+  const width =
+    originalWidth > MIN_MAP_WIDTH
+      ? findNextValidDimension(originalWidth)
+      : MIN_MAP_WIDTH;
+  const height =
+    originalHeight > MIN_MAP_HEIGHT
+      ? findNextValidDimension(originalHeight)
+      : MIN_MAP_HEIGHT;
+  canvas.width = width;
+  canvas.height = height;
+  ctx.fillStyle = transparentBackground ? "transparent" : backgroundColor;
+  ctx.fillRect(0, 0, width, height);
+
+  const dx = (width - originalWidth) / 2; // Center horizontally
+  const dy = height - originalHeight; // Align to bottom
+  ctx.putImageData(imageData, dx, dy);
+}
+
 // This function is used at the terrain & maskColor React states
 // So that value is stored at and read from URL params.
 // If the value not defined, it sets to defaultValue.
@@ -360,12 +397,18 @@ export default function Home() {
   const [sourceImage, setSourceImage] = React.useState<HTMLImageElement>(null);
   const [terrain, setTerrain] = useQueryParam("terrain", "Art");
   const [maskColor, setMaskColor] = useQueryParam("maskColor", "#ffffff");
+  const [backgroundColor, setBackgroundColor] = useQueryParam(
+    "backgroundColor",
+    "#000000"
+  );
   const [canvas, setCanvas] = React.useState<HTMLCanvasElement>();
   const [images, setImages] = React.useState({});
   const [dontDrawGrassOnUpperBorder, SetDontDrawGrassOnUpperBorder] =
     React.useState(0);
   const [dontDrawGrassOnLowerBorder, SetDontDrawGrassOnLowerBorder] =
     React.useState(0);
+  const [resizeOutput, setResizeOutput] = React.useState(0);
+  const [transparentBackground, setTransparentBackground] = React.useState(0);
 
   React.useEffect(() => {
     (async () => {
@@ -390,6 +433,9 @@ export default function Home() {
           images[`Terrain/${terrain}/grass.png`],
           hexToRgb(maskColor)
         );
+        if (resizeOutput) {
+          resize(canvas, transparentBackground === 1, backgroundColor);
+        }
       });
     }
   }, [
@@ -398,8 +444,11 @@ export default function Home() {
     sourceImage,
     images,
     maskColor,
+    backgroundColor,
     dontDrawGrassOnUpperBorder,
     dontDrawGrassOnLowerBorder,
+    resizeOutput,
+    transparentBackground,
   ]);
 
   const handleSetDontDrawGrassOnUpperBorder = (value: boolean) => {
@@ -407,6 +456,12 @@ export default function Home() {
   };
   const handleSetDontDrawGrassOnLowerBorder = (value: boolean) => {
     SetDontDrawGrassOnLowerBorder(value ? 1 : 0);
+  };
+  const handleSetResizeOutput = (value: boolean) => {
+    setResizeOutput(value ? 1 : 0);
+  };
+  const handleSetTransparentBackground = (value: boolean) => {
+    setTransparentBackground(value ? 1 : 0);
   };
 
   if (!terrain) {
@@ -423,7 +478,7 @@ export default function Home() {
       <input
         type="file"
         accept="image/*"
-        className="image-input"
+        className="options"
         onChange={(e) => {
           const file = e.target.files[0];
           const reader = new FileReader();
@@ -444,11 +499,12 @@ export default function Home() {
       </select>
       <input
         type="color"
+        className="color-input"
         value={maskColor}
         onChange={(e) => setMaskColor(e.target.value)}
       />
       <br />
-      <label className="grass-checkbox">
+      <label className="options">
         <input
           type="checkbox"
           id="upper-border"
@@ -460,7 +516,7 @@ export default function Home() {
         Don't draw grass on top image border
       </label>
       <br />
-      <label className="grass-checkbox">
+      <label className="options">
         <input
           type="checkbox"
           id="lower-border"
@@ -471,6 +527,40 @@ export default function Home() {
         />
         Don't draw grass on bottom image border
       </label>
+      <br />
+      <label className="options">
+        <input
+          type="checkbox"
+          id="resize"
+          value={resizeOutput}
+          onChange={(e) => handleSetResizeOutput(e.target.checked)}
+        />
+        Resize map to valid W:A dimensions
+      </label>
+      {resizeOutput === 1 && (
+        <div className="resize-options-div">
+          <label className="options">
+            Transparent background
+            <input
+              type="checkbox"
+              id="resize"
+              value={transparentBackground}
+              onChange={(e) => handleSetTransparentBackground(e.target.checked)}
+            />
+          </label>
+          <p className="options or">or</p>
+          <label className="options">
+            Set background color
+            <input
+              type="color"
+              className="color-input"
+              value={backgroundColor}
+              onChange={(e) => setBackgroundColor(e.target.value)}
+              disabled={transparentBackground === 1}
+            />
+          </label>
+        </div>
+      )}
       <br />
       <br />
       <canvas key={terrain} ref={setCanvas} />
