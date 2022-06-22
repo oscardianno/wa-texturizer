@@ -393,6 +393,17 @@ function hexToRgb(hex: string): Color {
   }
 }
 
+function getDownloadButton(downloadUrl: string) {
+  return (
+    <>
+      <br />
+      <a href={downloadUrl} download="wa-texturizer-map.png">
+        Download .png
+      </a>
+    </>
+  );
+}
+
 export default function Home() {
   const [sourceImage, setSourceImage] = React.useState<HTMLImageElement>(null);
   const [terrain, setTerrain] = useQueryParam("terrain", "Art");
@@ -409,6 +420,7 @@ export default function Home() {
     React.useState(0);
   const [resizeOutput, setResizeOutput] = React.useState(0);
   const [transparentBackground, setTransparentBackground] = React.useState(0);
+  const [downloadUrl, setDownloadUrl] = React.useState("");
 
   React.useEffect(() => {
     (async () => {
@@ -436,6 +448,7 @@ export default function Home() {
         if (resizeOutput) {
           resize(canvas, transparentBackground === 1, backgroundColor);
         }
+        setDownloadUrl(canvas.toDataURL("image/png"));
       });
     }
   }, [
@@ -563,6 +576,7 @@ export default function Home() {
         </div>
       )}
       <canvas key={terrain} ref={setCanvas} />
+      {!!sourceImage && getDownloadButton(downloadUrl)}
     </div>
   );
 }
