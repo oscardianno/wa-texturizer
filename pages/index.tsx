@@ -548,7 +548,7 @@ export default function Home() {
           value={resizeOutput}
           onChange={(e) => handleSetResizeOutput(e.target.checked)}
         />
-        Resize map to valid W:A dimensions
+        Resize to valid W:A map dimensions
       </label>
       <br />
       {resizeOutput === 1 && (
