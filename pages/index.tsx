@@ -1,6 +1,8 @@
 import Head from "next/head";
 import React from "react";
 import _ from "lodash";
+import * as png from "@vivaxy/png";
+import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [
@@ -128,6 +130,16 @@ function closeToBlack([r, g, b]: Color) {
   return r < 40 && g < 40 && b < 40;
 }
 
+function checkAndAddToColorPalette(color: Color, colorPalette: Color[]) {
+  // Check if the color isn't already in the colorPalette
+  for (let i = 0, length = colorPalette.length; i < length; i++) {
+    if (colorEqual(color, colorPalette[i])) {
+      return;
+    }
+  }
+  colorPalette.push(color);
+}
+
 // function copyImageData(context: CanvasRenderingContext2D, src: ImageData) {
 //     const dst = context.createImageData(src.width, src.height);
 //     dst.data.set(src.data);
@@ -160,7 +172,10 @@ function texturize(
   dontDrawGrassOnLowerBorder: number,
   textImage: HTMLImageElement,
   grassImage: HTMLImageElement,
-  maskColor: Color
+  maskColor: Color,
+  convertOutput: number,
+  transparentBackground: number,
+  backgroundColor: string
 ) {
   const originalHeight = sourceImage.height;
   const renderHeight =
@@ -238,6 +253,7 @@ function texturize(
     setPixelRow(imageData, y, lastPixelRow, MAX_GRASS_HEIGHT);
   }
 
+  const colorPalette: Color[] = [];
   // Texturization begins - scans horizontally in X from left to right
   for (let x = 0; x < sourceImage.width; x++) {
     // It applies grass from down to up, so position at the bottom pixel of the grass-bottom
@@ -272,11 +288,17 @@ function texturize(
         // Texturize the pixel with corresponding new color
         setPixel(newImageData, x, y, color);
 
+        // Store the color if it isn't present yet
+        if (convertOutput) checkAndAddToColorPalette(color, colorPalette);
+
         below--;
       } else {
         // If the color in this pixel wasn't equal to maskColor,
         // we must "reset" 'below' pixel position
         below = grassImage.height - grassBottomOffset - 1;
+
+        // Store the color if it isn't present yet
+        if (convertOutput) checkAndAddToColorPalette(sourceColor, colorPalette);
       }
     }
 
@@ -299,6 +321,9 @@ function texturize(
           // ...as long as it's not a close-to-black color
           if (!closeToBlack(color)) {
             setPixel(newImageData, x, y, color);
+
+            // Store the color if it isn't present yet
+            if (convertOutput) checkAndAddToColorPalette(color, colorPalette);
           }
         }
         above++;
@@ -308,6 +333,15 @@ function texturize(
         above = 0;
       }
     }
+  }
+
+  // Add backgroundColor to colorPalette if necessary
+  if (convertOutput) {
+    const bgColor: Color = transparentBackground
+      ? [0, 0, 0, 0]
+      : hexToRgb(backgroundColor);
+
+    if (convertOutput) checkAndAddToColorPalette(bgColor, colorPalette);
   }
 
   ctx.putImageData(newImageData, 0, 0);
@@ -321,6 +355,8 @@ function texturize(
     canvas.height = originalHeight;
     ctx.putImageData(croppedImageData, 0, 0);
   }
+
+  return colorPalette;
 }
 
 function findNextValidDimension(n: number): number {
@@ -356,6 +392,26 @@ function resize(
   const dx = (width - originalWidth) / 2; // Center horizontally
   const dy = height - originalHeight; // Align to bottom
   ctx.putImageData(imageData, dx, dy);
+}
+
+function convertOutputToIndexedPng(
+  canvas: HTMLCanvasElement,
+  colorPalette: Color[],
+  setDownloadUrl: Function
+) {
+  canvas.toBlob(
+    async function (blob) {
+      let metadata = png.decode(await blob.arrayBuffer());
+      metadata.colorType = COLOR_TYPES.PALETTE;
+      metadata.palette = colorPalette;
+      metadata.interlace = 0;
+      const imageBuffer = png.encode(metadata);
+      const fileBlob = new Blob([imageBuffer], { type: "image/png" });
+      setDownloadUrl(URL.createObjectURL(fileBlob));
+    },
+    "image/png",
+    1
+  );
 }
 
 // This function is used at the terrain & maskColor React states
@@ -418,6 +474,7 @@ export default function Home() {
     React.useState(0);
   const [dontDrawGrassOnLowerBorder, SetDontDrawGrassOnLowerBorder] =
     React.useState(0);
+  const [convertOutput, setConvertOutput] = React.useState(0);
   const [resizeOutput, setResizeOutput] = React.useState(0);
   const [transparentBackground, setTransparentBackground] = React.useState(0);
   const [downloadUrl, setDownloadUrl] = React.useState("");
@@ -436,19 +493,26 @@ export default function Home() {
       // expensive computations or HTML rendering in chunks without blocking
       // the UI thread from updating.
       _.defer(() => {
-        texturize(
+        const colorPalette = texturize(
           canvas,
           sourceImage,
           dontDrawGrassOnUpperBorder,
           dontDrawGrassOnLowerBorder,
           images[`Terrain/${terrain}/text.png`],
           images[`Terrain/${terrain}/grass.png`],
-          hexToRgb(maskColor)
+          hexToRgb(maskColor),
+          convertOutput,
+          transparentBackground,
+          backgroundColor
         );
         if (resizeOutput) {
           resize(canvas, transparentBackground === 1, backgroundColor);
         }
-        setDownloadUrl(canvas.toDataURL("image/png"));
+        if (convertOutput) {
+          convertOutputToIndexedPng(canvas, colorPalette, setDownloadUrl);
+        } else {
+          setDownloadUrl(canvas.toDataURL("image/png"));
+        }
       });
     }
   }, [
@@ -460,6 +524,7 @@ export default function Home() {
     backgroundColor,
     dontDrawGrassOnUpperBorder,
     dontDrawGrassOnLowerBorder,
+    convertOutput,
     resizeOutput,
     transparentBackground,
   ]);
@@ -469,6 +534,16 @@ export default function Home() {
   };
   const handleSetDontDrawGrassOnLowerBorder = (value: boolean) => {
     SetDontDrawGrassOnLowerBorder(value ? 1 : 0);
+  };
+  const handleSetConvertOutput = (value: boolean) => {
+    if (value) {
+      setConvertOutput(1);
+      // Force the ResizeOutput checkbox
+      setResizeOutput(1);
+      (document.getElementById("resize") as HTMLInputElement).checked = true;
+    } else {
+      setConvertOutput(0);
+    }
   };
   const handleSetResizeOutput = (value: boolean) => {
     setResizeOutput(value ? 1 : 0);
@@ -544,11 +619,22 @@ export default function Home() {
       <label className="options">
         <input
           type="checkbox"
+          id="convert"
+          value={convertOutput}
+          onChange={(e) => handleSetConvertOutput(e.target.checked)}
+        />
+        Convert output for W:A compatibility
+      </label>
+      <br />
+      <label className="options">
+        <input
+          type="checkbox"
           id="resize"
           value={resizeOutput}
+          disabled={convertOutput === 1}
           onChange={(e) => handleSetResizeOutput(e.target.checked)}
         />
-        Resize to valid W:A map dimensions
+        Resize output to valid W:A map dimensions
       </label>
       <br />
       {resizeOutput === 1 && (
