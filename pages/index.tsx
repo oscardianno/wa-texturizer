@@ -254,6 +254,30 @@ function texturize(
   }
 
   const colorPalette: Color[] = [];
+  // Prepare the colorPalette (if necessary)
+  if (convertOutput) {
+    // Add the backgroundColor first
+    const bgColor: Color = transparentBackground
+      ? [0, 0, 0, 0]
+      : hexToRgb(backgroundColor);
+    colorPalette.push(bgColor);
+
+    // Add the colors from texture images
+    const texturesArray = [
+      textImageData,
+      grassTopImageData,
+      grassBottomImageData,
+    ];
+    for (let i = 0; i < texturesArray.length; i++) {
+      const texture = texturesArray[i];
+      for (let x = 0; x < texture.width; x++) {
+        for (let y = 0; y < texture.height; y++) {
+          checkAndAddToColorPalette(getPixel(texture, x, y), colorPalette);
+        }
+      }
+    }
+  }
+
   // Texturization begins - scans horizontally in X from left to right
   for (let x = 0; x < sourceImage.width; x++) {
     // It applies grass from down to up, so position at the bottom pixel of the grass-bottom
@@ -288,16 +312,13 @@ function texturize(
         // Texturize the pixel with corresponding new color
         setPixel(newImageData, x, y, color);
 
-        // Store the color if it isn't present yet
-        if (convertOutput) checkAndAddToColorPalette(color, colorPalette);
-
         below--;
       } else {
         // If the color in this pixel wasn't equal to maskColor,
         // we must "reset" 'below' pixel position
         below = grassImage.height - grassBottomOffset - 1;
 
-        // Store the color if it isn't present yet
+        // Add sourceColor to colorPalette (if it isn't present yet)
         if (convertOutput) checkAndAddToColorPalette(sourceColor, colorPalette);
       }
     }
@@ -321,9 +342,6 @@ function texturize(
           // ...as long as it's not a close-to-black color
           if (!closeToBlack(color)) {
             setPixel(newImageData, x, y, color);
-
-            // Store the color if it isn't present yet
-            if (convertOutput) checkAndAddToColorPalette(color, colorPalette);
           }
         }
         above++;
@@ -333,15 +351,6 @@ function texturize(
         above = 0;
       }
     }
-  }
-
-  // Add backgroundColor to colorPalette if necessary
-  if (convertOutput) {
-    const bgColor: Color = transparentBackground
-      ? [0, 0, 0, 0]
-      : hexToRgb(backgroundColor);
-
-    if (convertOutput) checkAndAddToColorPalette(bgColor, colorPalette);
   }
 
   ctx.putImageData(newImageData, 0, 0);
