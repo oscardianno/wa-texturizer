@@ -1,7 +1,11 @@
 import Head from "next/head";
 import React from "react";
 import _ from "lodash";
-import { texturize, resize, convertOutputToIndexedPng } from "./image-processing";
+import {
+  texturize,
+  resize,
+  convertOutputToIndexedPng,
+} from "./image-processing";
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [
@@ -146,9 +150,10 @@ export default function Home() {
           transparentBackground,
           backgroundColor
         );
-        if (resizeOutput) {
+
+        if (resizeOutput)
           resize(canvas, transparentBackground, backgroundColor);
-        }
+
         if (convertOutput) {
           convertOutputToIndexedPng(canvas, colorPalette, setDownloadUrl);
         } else {
@@ -172,10 +177,8 @@ export default function Home() {
 
   const handleSetConvertOutput = (value: boolean) => {
     setConvertOutput(value);
-    if (value) {
-      // Force the resizeOutput checkbox
-      setResizeOutput(true);
-    }
+    // Force the resizeOutput checkbox
+    if (value) setResizeOutput(true);
   };
 
   if (!terrain) {

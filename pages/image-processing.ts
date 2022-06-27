@@ -191,14 +191,7 @@ export function texturize(
 
   ctx.putImageData(newImageData, 0, 0);
   if (dontDrawGrassOnUpperBorder || dontDrawGrassOnLowerBorder) {
-    const croppedImageData = ctx.getImageData(
-      0,
-      heightOffset,
-      sourceImage.width,
-      originalHeight,
-    );
-    canvas.height = originalHeight;
-    ctx.putImageData(croppedImageData, 0, 0);
+    cropCanvas(canvas, ctx, sourceImage.width, originalHeight, heightOffset);
   }
 
   return colorPalette;
@@ -281,6 +274,19 @@ function getContext(image: HTMLImageElement): CanvasRenderingContext2D {
 //   dst.data.set(src.data);
 //   return dst;
 // }
+
+// Crop canvas to remove map border bars
+function cropCanvas(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  heightOffset: number,
+) {
+  const croppedImageData = ctx.getImageData(0, heightOffset, width, height);
+  canvas.height = height;
+  ctx.putImageData(croppedImageData, 0, 0);
+}
 
 function hexToRgb(hex: string): Color {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
