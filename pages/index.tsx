@@ -5,7 +5,7 @@ import {
   texturize,
   resize,
   convertOutputToIndexedPng,
-} from "./image-processing";
+} from "./../src/image-processing";
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [

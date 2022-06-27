@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import * as png from '@vivaxy/png';
-import { COLOR_TYPES } from '@vivaxy/png/lib/helpers/color-types';
-import { TERRAIN_TEXTURES_COLOR_PALETTES } from './color-palettes';
+import _ from "lodash";
+import * as png from "@vivaxy/png";
+import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
+import { TERRAIN_TEXTURES_COLOR_PALETTES } from "./pre-computed-data";
 
 const MAX_GRASS_HEIGHT = 64;
 const MIN_MAP_WIDTH = 640;
@@ -23,8 +23,8 @@ export function texturize(
   maskColorString: string,
   convertOutput: boolean,
   transparentBackground: boolean,
-  backgroundColor: string,
-) {
+  backgroundColor: string
+): Color[] {
   const maskColor = hexToRgb(maskColorString);
   const originalHeight = sourceImage.height;
   const renderHeight =
@@ -33,7 +33,7 @@ export function texturize(
     (dontDrawGrassOnLowerBorder ? MAX_GRASS_HEIGHT : 0);
   const heightOffset = dontDrawGrassOnUpperBorder ? MAX_GRASS_HEIGHT : 0;
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   canvas.width = sourceImage.width;
   canvas.height = renderHeight;
   ctx.drawImage(sourceImage, 0, heightOffset);
@@ -51,7 +51,7 @@ export function texturize(
     0,
     0,
     textImage.width,
-    textImage.height,
+    textImage.height
   );
 
   // Grass files have 64 width for each top and bottom parts
@@ -61,13 +61,13 @@ export function texturize(
     0,
     0,
     grassWidth,
-    grassImage.height,
+    grassImage.height
   );
   const grassBottomImageData = grassContext.getImageData(
     grassWidth,
     0,
     grassWidth,
-    grassImage.height,
+    grassImage.height
   );
 
   // Grass had to be modified so it's always a smooth top & bottom
@@ -141,7 +141,7 @@ export function texturize(
           color = getPixel(
             textImageData,
             x % textImage.width,
-            y % textImage.height,
+            y % textImage.height
           );
         }
 
@@ -173,7 +173,7 @@ export function texturize(
           const color = getPixel(
             grassTopImageData,
             x % grassWidth,
-            above + grassTopOffset,
+            above + grassTopOffset
           );
           // ...as long as it's not a close-to-black color
           if (!closeToBlack(color)) {
@@ -200,9 +200,9 @@ export function texturize(
 export function resize(
   canvas: HTMLCanvasElement,
   transparentBackground: boolean,
-  backgroundColor: string,
+  backgroundColor: string
 ) {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const originalWidth = canvas.width;
   const originalHeight = canvas.height;
@@ -217,7 +217,7 @@ export function resize(
       : MIN_MAP_HEIGHT;
   canvas.width = width;
   canvas.height = height;
-  ctx.fillStyle = transparentBackground ? 'transparent' : backgroundColor;
+  ctx.fillStyle = transparentBackground ? "transparent" : backgroundColor;
   ctx.fillRect(0, 0, width, height);
 
   const dx = (width - originalWidth) / 2; // Center horizontally
@@ -228,7 +228,7 @@ export function resize(
 export function convertOutputToIndexedPng(
   canvas: HTMLCanvasElement,
   colorPalette: Color[],
-  setDownloadUrl: Function,
+  setDownloadUrl: Function
 ) {
   canvas.toBlob(
     async function (blob) {
@@ -237,18 +237,18 @@ export function convertOutputToIndexedPng(
       metadata.palette = colorPalette;
       metadata.interlace = 0;
       const imageBuffer = png.encode(metadata);
-      const fileBlob = new Blob([imageBuffer], { type: 'image/png' });
+      const fileBlob = new Blob([imageBuffer], { type: "image/png" });
       setDownloadUrl(URL.createObjectURL(fileBlob));
     },
-    'image/png',
-    1,
+    "image/png",
+    1
   );
 }
 
 // Creates and returns a HTMLCanvasElement out of a HTMLImageElement
 function _getCanvas(image: HTMLImageElement): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
   // Draw the given image on the created canvas
   canvas.width = image.width;
   canvas.height = image.height;
@@ -266,7 +266,7 @@ function getContext(image: HTMLImageElement): CanvasRenderingContext2D {
   line widths, fonts, and other graphic parameters that can be 
   drawn on a canvas. */
   const canvas = getCanvas(image);
-  return canvas.getContext('2d');
+  return canvas.getContext("2d");
 }
 
 // function copyImageData(context: CanvasRenderingContext2D, src: ImageData) {
@@ -281,7 +281,7 @@ function cropCanvas(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  heightOffset: number,
+  heightOffset: number
 ) {
   const croppedImageData = ctx.getImageData(0, heightOffset, width, height);
   canvas.height = height;
@@ -307,7 +307,7 @@ function getPixel(imgData: ImageData, x: number, y: number): Color {
   const index = y * imgData.width + x;
   // Then we multiply the index * 4, because each color is made of 4 values
   // (RGBA), and we slice 4 elements to get the color.
-  return (imgData.data.slice(index * 4, index * 4 + 4) as unknown) as Color;
+  return imgData.data.slice(index * 4, index * 4 + 4) as unknown as Color;
 }
 
 // Sets the color of a pixel in an ImageData
@@ -319,17 +319,14 @@ function setPixel(imgData: ImageData, x: number, y: number, color: Color) {
 function getPixelRow(imgData: ImageData, y: number): Color[] {
   const rowLengthInBytes = imgData.width * 4;
   const index = y * rowLengthInBytes;
-  return (imgData.data.slice(
-    index,
-    index + rowLengthInBytes,
-  ) as unknown) as any;
+  return imgData.data.slice(index, index + rowLengthInBytes) as unknown as any;
 }
 
 function setPixelRow(
   imgData: ImageData,
   y: number,
   row: Color[],
-  numberOfRows: number = 1,
+  numberOfRows: number = 1
 ) {
   const rowLengthInBytes = imgData.width * 4;
   for (let i = 0; i < numberOfRows; i++) {
@@ -347,7 +344,7 @@ function colorEqual(c1: Color, c2: Color): boolean {
 }
 
 // Checks if a color is close to black
-function closeToBlack([r, g, b]: Color) {
+function closeToBlack([r, g, b]: Color): boolean {
   return r < 40 && g < 40 && b < 40;
 }
 
