@@ -3,6 +3,7 @@ import React from "react";
 import _ from "lodash";
 import * as png from "@vivaxy/png";
 import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
+import { TERRAIN_TEXTURES_COLOR_PALETTES } from "./color-palettes";
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [
@@ -130,6 +131,17 @@ function closeToBlack([r, g, b]: Color) {
   return r < 40 && g < 40 && b < 40;
 }
 
+function setFirstColorInPalette(color: Color, colorPalette: Color[]) {
+  for (let i = 0, length = colorPalette.length; i < length; i++) {
+    if (colorEqual(color, colorPalette[i])) {
+      if (i === 0) return;
+      colorPalette.splice(i, 1);
+      break;
+    }
+  }
+  colorPalette.unshift(color);
+}
+
 function checkAndAddToColorPalette(color: Color, colorPalette: Color[]) {
   // Check if the color isn't already in the colorPalette
   for (let i = 0, length = colorPalette.length; i < length; i++) {
@@ -166,6 +178,7 @@ function setPixelRow(
 
 // Applies the selected terrain's texture/grass to the given sourceImage
 function texturize(
+  terrain: string,
   canvas: HTMLCanvasElement,
   sourceImage: HTMLImageElement,
   dontDrawGrassOnUpperBorder: number,
@@ -253,29 +266,16 @@ function texturize(
     setPixelRow(imageData, y, lastPixelRow, MAX_GRASS_HEIGHT);
   }
 
-  const colorPalette: Color[] = [];
+  let colorPalette: Color[] = [];
   // Prepare the colorPalette (if necessary)
   if (convertOutput) {
-    // Add the backgroundColor first
+    // Add the colors from texture images
+    colorPalette = TERRAIN_TEXTURES_COLOR_PALETTES[terrain];
+    // Add the backgroundColor as the first in palette
     const bgColor: Color = transparentBackground
       ? [0, 0, 0, 0]
       : hexToRgb(backgroundColor);
-    colorPalette.push(bgColor);
-
-    // Add the colors from texture images
-    const texturesArray = [
-      textImageData,
-      grassTopImageData,
-      grassBottomImageData,
-    ];
-    for (let i = 0; i < texturesArray.length; i++) {
-      const texture = texturesArray[i];
-      for (let x = 0; x < texture.width; x++) {
-        for (let y = 0; y < texture.height; y++) {
-          checkAndAddToColorPalette(getPixel(texture, x, y), colorPalette);
-        }
-      }
-    }
+    setFirstColorInPalette(bgColor, colorPalette);
   }
 
   // Texturization begins - scans horizontally in X from left to right
@@ -503,6 +503,7 @@ export default function Home() {
       // the UI thread from updating.
       _.defer(() => {
         const colorPalette = texturize(
+          terrain,
           canvas,
           sourceImage,
           dontDrawGrassOnUpperBorder,
