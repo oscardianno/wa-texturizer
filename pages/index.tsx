@@ -181,21 +181,21 @@ function texturize(
   terrain: string,
   canvas: HTMLCanvasElement,
   sourceImage: HTMLImageElement,
-  dontDrawGrassOnUpperBorder: number,
-  dontDrawGrassOnLowerBorder: number,
+  dontDrawGrassOnUpperBorder: boolean,
+  dontDrawGrassOnLowerBorder: boolean,
   textImage: HTMLImageElement,
   grassImage: HTMLImageElement,
   maskColor: Color,
-  convertOutput: number,
-  transparentBackground: number,
+  convertOutput: boolean,
+  transparentBackground: boolean,
   backgroundColor: string
 ) {
   const originalHeight = sourceImage.height;
   const renderHeight =
     originalHeight +
-    dontDrawGrassOnUpperBorder * MAX_GRASS_HEIGHT +
-    dontDrawGrassOnLowerBorder * MAX_GRASS_HEIGHT;
-  const heightOffset = dontDrawGrassOnUpperBorder * MAX_GRASS_HEIGHT;
+    (dontDrawGrassOnUpperBorder ? MAX_GRASS_HEIGHT : 0) +
+    (dontDrawGrassOnLowerBorder ? MAX_GRASS_HEIGHT : 0);
+  const heightOffset = dontDrawGrassOnUpperBorder ? MAX_GRASS_HEIGHT : 0;
 
   const ctx = canvas.getContext("2d");
   canvas.width = sourceImage.width;
@@ -479,13 +479,14 @@ export default function Home() {
   );
   const [canvas, setCanvas] = React.useState<HTMLCanvasElement>();
   const [images, setImages] = React.useState({});
-  const [dontDrawGrassOnUpperBorder, SetDontDrawGrassOnUpperBorder] =
-    React.useState(0);
-  const [dontDrawGrassOnLowerBorder, SetDontDrawGrassOnLowerBorder] =
-    React.useState(0);
-  const [convertOutput, setConvertOutput] = React.useState(0);
-  const [resizeOutput, setResizeOutput] = React.useState(0);
-  const [transparentBackground, setTransparentBackground] = React.useState(0);
+  const [dontDrawGrassOnUpperBorder, setDontDrawGrassOnUpperBorder] =
+    React.useState(false);
+  const [dontDrawGrassOnLowerBorder, setDontDrawGrassOnLowerBorder] =
+    React.useState(false);
+  const [convertOutput, setConvertOutput] = React.useState(false);
+  const [resizeOutput, setResizeOutput] = React.useState(false);
+  const [transparentBackground, setTransparentBackground] =
+    React.useState(false);
   const [downloadUrl, setDownloadUrl] = React.useState("");
 
   React.useEffect(() => {
@@ -516,7 +517,7 @@ export default function Home() {
           backgroundColor
         );
         if (resizeOutput) {
-          resize(canvas, transparentBackground === 1, backgroundColor);
+          resize(canvas, transparentBackground, backgroundColor);
         }
         if (convertOutput) {
           convertOutputToIndexedPng(canvas, colorPalette, setDownloadUrl);
@@ -539,27 +540,12 @@ export default function Home() {
     transparentBackground,
   ]);
 
-  const handleSetDontDrawGrassOnUpperBorder = (value: boolean) => {
-    SetDontDrawGrassOnUpperBorder(value ? 1 : 0);
-  };
-  const handleSetDontDrawGrassOnLowerBorder = (value: boolean) => {
-    SetDontDrawGrassOnLowerBorder(value ? 1 : 0);
-  };
   const handleSetConvertOutput = (value: boolean) => {
+    setConvertOutput(value);
     if (value) {
-      setConvertOutput(1);
-      // Force the ResizeOutput checkbox
-      setResizeOutput(1);
-      (document.getElementById("resize") as HTMLInputElement).checked = true;
-    } else {
-      setConvertOutput(0);
+      // Force the resizeOutput checkbox
+      setResizeOutput(true);
     }
-  };
-  const handleSetResizeOutput = (value: boolean) => {
-    setResizeOutput(value ? 1 : 0);
-  };
-  const handleSetTransparentBackground = (value: boolean) => {
-    setTransparentBackground(value ? 1 : 0);
   };
 
   if (!terrain) {
@@ -606,10 +592,8 @@ export default function Home() {
         <input
           type="checkbox"
           id="upper-border"
-          value={dontDrawGrassOnUpperBorder}
-          onChange={(e) =>
-            handleSetDontDrawGrassOnUpperBorder(e.target.checked)
-          }
+          checked={dontDrawGrassOnUpperBorder}
+          onChange={(e) => setDontDrawGrassOnUpperBorder(e.target.checked)}
         />
         Don't draw grass on top image border
       </label>
@@ -618,10 +602,8 @@ export default function Home() {
         <input
           type="checkbox"
           id="lower-border"
-          value={dontDrawGrassOnLowerBorder}
-          onChange={(e) =>
-            handleSetDontDrawGrassOnLowerBorder(e.target.checked)
-          }
+          checked={dontDrawGrassOnLowerBorder}
+          onChange={(e) => setDontDrawGrassOnLowerBorder(e.target.checked)}
         />
         Don't draw grass on bottom image border
       </label>
@@ -630,7 +612,7 @@ export default function Home() {
         <input
           type="checkbox"
           id="convert"
-          value={convertOutput}
+          checked={convertOutput}
           onChange={(e) => handleSetConvertOutput(e.target.checked)}
         />
         Convert output for W:A compatibility
@@ -640,22 +622,22 @@ export default function Home() {
         <input
           type="checkbox"
           id="resize"
-          value={resizeOutput}
-          disabled={convertOutput === 1}
-          onChange={(e) => handleSetResizeOutput(e.target.checked)}
+          checked={resizeOutput}
+          disabled={convertOutput}
+          onChange={(e) => setResizeOutput(e.target.checked)}
         />
         Resize output to valid W:A map dimensions
       </label>
       <br />
-      {resizeOutput === 1 && (
+      {resizeOutput && (
         <div className="resize-options-div">
           <label className="options">
             Transparent background
             <input
               type="checkbox"
               id="resize"
-              value={transparentBackground}
-              onChange={(e) => handleSetTransparentBackground(e.target.checked)}
+              checked={transparentBackground}
+              onChange={(e) => setTransparentBackground(e.target.checked)}
             />
           </label>
           <p className="options or">or</p>
@@ -666,7 +648,7 @@ export default function Home() {
               className="color-input"
               value={backgroundColor}
               onChange={(e) => setBackgroundColor(e.target.value)}
-              disabled={transparentBackground === 1}
+              disabled={transparentBackground}
             />
           </label>
         </div>
