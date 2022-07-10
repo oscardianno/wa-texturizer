@@ -92,13 +92,54 @@ function useQueryParam(
   ];
 }
 
-function getDownloadButton(downloadUrl: string) {
+function getDownloadInfo(
+  downloadUrl: string,
+  colorPaletteCount: number,
+  transparentBackground: boolean
+) {
+  let message = "";
+  let wikiSource = "https://worms2d.info/Colour_map#Colour_limitation";
+  if (colorPaletteCount > 0) {
+    if (transparentBackground) colorPaletteCount -= 1;
+
+    if (colorPaletteCount < 65) {
+      message = "It will be displayed perfectly, with no glitches";
+    } else if (colorPaletteCount < 97) {
+      message =
+        "Background sprites (falling debris, clouds, etc.) will be removed, " +
+        "and the destroyed-soil background may be glitchy";
+    } else if (colorPaletteCount < 113) {
+      message =
+        "Background sprites (falling debris, clouds, etc.) will be removed, " +
+        "the destroyed soil background will be transparent, " +
+        "the destroyed-soil border will be solid gray and " +
+        "the background gradient will appear dithered.";
+    } else {
+      message =
+        "It will not load. You'll have to use some " +
+        "image editor software to reduce the number of colors.";
+    }
+  }
   return (
     <>
       <br />
       <a href={downloadUrl} download="wa-texturizer-map.png">
         Download .png
       </a>
+      {colorPaletteCount > 0 && (
+        <div className="options">
+          <div>
+            <span>Your map contains </span>
+            <span className="highlight">{colorPaletteCount}</span>
+            <span> colors</span>
+          </div>
+          <span>{message}</span>
+          <span className="highlight"> - </span>
+          <a href={wikiSource} target="_blank">
+            Read more
+          </a>
+        </div>
+      )}
     </>
   );
 }
@@ -121,6 +162,7 @@ export default function Home() {
   const [resizeOutput, setResizeOutput] = React.useState(false);
   const [transparentBackground, setTransparentBackground] =
     React.useState(false);
+  const [colorPaletteCount, setColorPaletteCount] = React.useState(0);
   const [downloadUrl, setDownloadUrl] = React.useState("");
 
   React.useEffect(() => {
@@ -154,6 +196,7 @@ export default function Home() {
         if (resizeOutput)
           resize(canvas, transparentBackground, backgroundColor);
 
+        setColorPaletteCount(colorPalette.length);
         if (convertOutput) {
           convertOutputToIndexedPng(
             canvas,
@@ -297,7 +340,8 @@ export default function Home() {
         </div>
       )}
       <canvas key={terrain.name} ref={setCanvas} />
-      {!!sourceImage && getDownloadButton(downloadUrl)}
+      {!!sourceImage &&
+        getDownloadInfo(downloadUrl, colorPaletteCount, transparentBackground)}
     </div>
   );
 }

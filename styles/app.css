@@ -7,6 +7,10 @@ canvas {
     border: 1px solid white;
 }
 
+.highlight {
+    color: yellow;
+}
+
 .options {
     color: white;
     font-family: Arial, Helvetica, sans-serif;
