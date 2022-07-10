@@ -1,5 +1,7 @@
 import _ from "lodash";
+import CRC32 from "crc-32";
 import * as png from "@vivaxy/png";
+import { getChunks, toPNG } from "png-chunks";
 import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
 import { TERRAIN_TEXTURES_COLOR_PALETTES } from "./pre-computed-data";
 
@@ -7,9 +9,17 @@ const MAX_GRASS_HEIGHT = 64;
 const MIN_MAP_WIDTH = 640;
 const MIN_MAP_HEIGHT = 32;
 
-// Defines a type for the color of pixels. RGB + alpha
-// Each pixel is a 4-byte value - "RGBA" format
+const SOIL_SIGNED_VERSION = 1;
+
+// Each pixel is a 4-byte value - "RGBA" format (RGB + alpha)
 type Color = [r: number, g: number, b: number, a: number];
+
+type PngChunk = {
+  chunkType: string;
+  crc: number;
+  data: Uint8Array;
+  length: number;
+};
 
 // Applies the selected terrain's texture/grass to the given sourceImage
 export function texturize(
@@ -227,16 +237,25 @@ export function resize(
 
 export function convertOutputToIndexedPng(
   canvas: HTMLCanvasElement,
+  terrainIndex: number,
   colorPalette: Color[],
   setDownloadUrl: Function
 ) {
   canvas.toBlob(
     async function (blob) {
+      // Encode PNG with indexed color palette
       let metadata = png.decode(await blob.arrayBuffer());
       metadata.colorType = COLOR_TYPES.PALETTE;
       metadata.palette = colorPalette;
       metadata.interlace = 0;
-      const imageBuffer = png.encode(metadata);
+      let imageBuffer = png.encode(metadata);
+      // Write W:A extra PNG chunk
+      const walvChunk = composeWalvChunk(terrainIndex);
+      const pngChunks: PngChunk[] = getChunks(imageBuffer);
+      // Insert as the 3rd chunk
+      pngChunks.splice(1, 0, walvChunk);
+      imageBuffer = toPNG(pngChunks);
+      // Generate file URL
       const fileBlob = new Blob([imageBuffer], { type: "image/png" });
       setDownloadUrl(URL.createObjectURL(fileBlob));
     },
@@ -374,4 +393,29 @@ function findNextValidDimension(n: number): number {
     n++;
   }
   return n;
+}
+
+// Read: https://worms2d.info/Monochrome_map_(.bit,_.lev)#File_Format_Specifications
+function composeWalvChunk(terrainIndex: number): PngChunk {
+  const t = terrainIndex || 0;
+  const v = SOIL_SIGNED_VERSION;
+
+  const chunkData = new Uint8Array(41);
+  chunkData.set([0, 0, 0, 0], 0); // 0x00 Land Seed
+  chunkData.set([0, 0, 0, 0], 4); // 0x04 Object Seed
+  chunkData.set([0, 0, 0, 0], 8); // 0x08 Cavern
+  chunkData.set([0, 0, 0, 0], 12); // 0x0C Style
+  chunkData.set([1, 0, 0, 0], 16); // 0x10 No Indestructible Borders
+  chunkData.set([85, 0, 0, 0], 20); // 0x14 Object Percentage
+  chunkData.set([30, 0, 0, 0], 24); // 0x18 Bridge Percentage
+  chunkData.set([0, 0, 0, 0], 28); // 0x1C Water Level
+  chunkData.set([t, 0, v, 0], 32); // 0x20 Soil Texture Index
+  chunkData.set([0, 0, 0, 0], 36); // 0x24 Water Colour
+  chunkData.set([0], 40); // 0x28 Worm Places
+
+  return <PngChunk>{
+    chunkType: "waLV",
+    data: chunkData,
+    length: 41,
+  };
 }

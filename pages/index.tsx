@@ -9,42 +9,42 @@ import {
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [
-  "Art",
-  "-Beach",
-  "Cheese",
-  "Construction",
-  "Desert",
-  "-Desert",
-  // "Dungeon",
-  "Easter",
-  "-Farm",
-  "Forest",
-  "-Forest",
-  "Fruit",
-  "Gulf",
-  "Hell",
-  "-Hell",
-  "Hospital",
-  "Jungle",
-  "Manhattan",
-  "Medieval",
-  "Music",
-  "Pirate",
-  "Snow",
-  "Space",
-  "Sports",
-  "Tentacle",
-  "Time",
-  "Tools",
-  "Tribal",
-  "Urban",
+  { name: "-Beach", index: 0 },
+  { name: "-Desert", index: 1 },
+  { name: "-Forest", index: 2 },
+  { name: "-Farm", index: 3 },
+  { name: "-Hell", index: 4 },
+  { name: "Art", index: 5 },
+  { name: "Cheese", index: 6 },
+  { name: "Construction", index: 7 },
+  { name: "Desert", index: 8 },
+  // {name: "Dungeon", index: 9},
+  { name: "Easter", index: 10 },
+  { name: "Forest", index: 11 },
+  { name: "Fruit", index: 12 },
+  { name: "Gulf", index: 13 },
+  { name: "Hell", index: 14 },
+  { name: "Hospital", index: 15 },
+  { name: "Jungle", index: 16 },
+  { name: "Manhattan", index: 17 },
+  { name: "Medieval", index: 18 },
+  { name: "Music", index: 19 },
+  { name: "Pirate", index: 20 },
+  { name: "Snow", index: 21 },
+  { name: "Space", index: 22 },
+  { name: "Sports", index: 23 },
+  { name: "Tentacle", index: 24 },
+  { name: "Time", index: 25 },
+  { name: "Tools", index: 26 },
+  { name: "Tribal", index: 27 },
+  { name: "Urban", index: 28 },
 ];
 
 // IMAGE_PATHS stores the paths of the images needed for each terrain available
 // text.png for the texture and grass.png
 const IMAGE_PATHS = [
-  ...TERRAINS.map((t) => `Terrain/${t}/text.png`),
-  ...TERRAINS.map((t) => `Terrain/${t}/grass.png`),
+  ...TERRAINS.map((t) => `Terrain/${t.name}/text.png`),
+  ...TERRAINS.map((t) => `Terrain/${t.name}/grass.png`),
 ];
 
 // Loads all the images from IMAGE_PATHS
@@ -105,7 +105,7 @@ function getDownloadButton(downloadUrl: string) {
 
 export default function Home() {
   const [sourceImage, setSourceImage] = React.useState<HTMLImageElement>(null);
-  const [terrain, setTerrain] = useQueryParam("terrain", "Art");
+  const [terrain, setTerrain] = React.useState(TERRAINS[5]);
   const [maskColor, setMaskColor] = useQueryParam("maskColor", "#ffffff");
   const [backgroundColor, setBackgroundColor] = useQueryParam(
     "backgroundColor",
@@ -138,13 +138,13 @@ export default function Home() {
       // the UI thread from updating.
       _.defer(() => {
         const colorPalette = texturize(
-          terrain,
+          terrain.name,
           canvas,
           sourceImage,
           dontDrawGrassOnUpperBorder,
           dontDrawGrassOnLowerBorder,
-          images[`Terrain/${terrain}/text.png`],
-          images[`Terrain/${terrain}/grass.png`],
+          images[`Terrain/${terrain.name}/text.png`],
+          images[`Terrain/${terrain.name}/grass.png`],
           maskColor,
           convertOutput,
           transparentBackground,
@@ -155,7 +155,12 @@ export default function Home() {
           resize(canvas, transparentBackground, backgroundColor);
 
         if (convertOutput) {
-          convertOutputToIndexedPng(canvas, colorPalette, setDownloadUrl);
+          convertOutputToIndexedPng(
+            canvas,
+            terrain.index,
+            colorPalette,
+            setDownloadUrl
+          );
         } else {
           setDownloadUrl(canvas.toDataURL("image/png"));
         }
@@ -207,10 +212,15 @@ export default function Home() {
           reader.readAsDataURL(file);
         }}
       />
-      <select value={terrain} onChange={(e) => setTerrain(e.target.value)}>
+      <select
+        value={terrain.name}
+        onChange={(e) =>
+          setTerrain(TERRAINS.find((t) => t.name === e.target.value))
+        }
+      >
         {TERRAINS.map((t) => (
-          <option key={t} value={t}>
-            {t}
+          <option key={t.name} value={t.name}>
+            {t.name}
           </option>
         ))}
       </select>
@@ -286,7 +296,7 @@ export default function Home() {
           </label>
         </div>
       )}
-      <canvas key={terrain} ref={setCanvas} />
+      <canvas key={terrain.name} ref={setCanvas} />
       {!!sourceImage && getDownloadButton(downloadUrl)}
     </div>
   );
