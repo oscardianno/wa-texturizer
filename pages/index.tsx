@@ -221,13 +221,23 @@ export default function Home() {
     convertOutput,
     resizeOutput,
     transparentBackground,
-    colorPaletteCount,
   ]);
 
   const handleSetConvertOutput = (value: boolean) => {
     setConvertOutput(value);
     // Force the resizeOutput checkbox
     if (value) setResizeOutput(true);
+  };
+
+  const handleUploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      const img = new Image();
+      img.addEventListener("load", () => setSourceImage(img));
+      img.src = reader.result.toString();
+    });
+    reader.readAsDataURL(file);
   };
 
   if (!terrain) {
@@ -246,14 +256,7 @@ export default function Home() {
         accept="image/*"
         className="options"
         onChange={(e) => {
-          const file = e.target.files[0];
-          const reader = new FileReader();
-          reader.addEventListener("load", () => {
-            const img = new Image();
-            img.addEventListener("load", () => setSourceImage(img));
-            img.src = reader.result.toString();
-          });
-          reader.readAsDataURL(file);
+          handleUploadFile(e);
         }}
       />
       <select
