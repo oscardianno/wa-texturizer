@@ -42,6 +42,7 @@ const TERRAINS = [
 
 // IMAGE_PATHS stores the paths of the images needed for each terrain available
 // text.png for the texture and grass.png
+const SAMPLE_IMAGE_PATH = "Sample/sample-map-reduced.png";
 const IMAGE_PATHS = [
   ...TERRAINS.map((t) => `Terrain/${t.name}/text.png`),
   ...TERRAINS.map((t) => `Terrain/${t.name}/grass.png`),
@@ -103,11 +104,11 @@ function getDownloadInfo(
     if (transparentBackground) colorPaletteCount -= 1;
 
     if (colorPaletteCount < 65) {
-      message = "It will be displayed perfectly, with no glitches";
+      message = "It will be displayed perfectly, with no glitches.";
     } else if (colorPaletteCount < 97) {
       message =
         "Background sprites (falling debris, clouds, etc.) will be removed, " +
-        "and the destroyed-soil background may be glitchy";
+        "and the destroyed-soil background may be glitchy.";
     } else if (colorPaletteCount < 113) {
       message =
         "Background sprites (falling debris, clouds, etc.) will be removed, " +
@@ -168,6 +169,8 @@ export default function Home() {
   React.useEffect(() => {
     (async () => {
       setImages(await loadImages(IMAGE_PATHS));
+      const sampleImage = await loadImages([SAMPLE_IMAGE_PATH]);
+      setSourceImage(Object.values(sampleImage)[0]);
     })();
   }, []);
 
