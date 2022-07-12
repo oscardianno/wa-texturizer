@@ -146,7 +146,7 @@ function getDownloadInfo(
 
 export default function Home() {
   const [sourceImage, setSourceImage] = React.useState<HTMLImageElement>(null);
-  const [terrain, setTerrain] = React.useState(TERRAINS[5]);
+  const [terrain, setTerrain] = React.useState(TERRAINS[6]);
   const [maskColor, setMaskColor] = useQueryParam("maskColor", "#ffffff");
   const [backgroundColor, setBackgroundColor] = useQueryParam(
     "backgroundColor",
@@ -221,6 +221,7 @@ export default function Home() {
     convertOutput,
     resizeOutput,
     transparentBackground,
+    colorPaletteCount,
   ]);
 
   const handleSetConvertOutput = (value: boolean) => {
