@@ -183,11 +183,11 @@ export default function Home() {
           terrain.name,
           canvas,
           sourceImage,
-          dontDrawGrassOnUpperBorder,
-          dontDrawGrassOnLowerBorder,
           images[`Terrain/${terrain.name}/text.png`],
           images[`Terrain/${terrain.name}/grass.png`],
           maskColor,
+          dontDrawGrassOnUpperBorder,
+          dontDrawGrassOnLowerBorder,
           convertOutput,
           transparentBackground,
           backgroundColor

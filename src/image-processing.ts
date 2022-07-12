@@ -1,5 +1,4 @@
 import _ from "lodash";
-import CRC32 from "crc-32";
 import * as png from "@vivaxy/png";
 import { getChunks, toPNG } from "png-chunks";
 import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
@@ -26,11 +25,11 @@ export function texturize(
   terrain: string,
   canvas: HTMLCanvasElement,
   sourceImage: HTMLImageElement,
-  dontDrawGrassOnUpperBorder: boolean,
-  dontDrawGrassOnLowerBorder: boolean,
   textImage: HTMLImageElement,
   grassImage: HTMLImageElement,
   maskColorString: string,
+  dontDrawGrassOnUpperBorder: boolean,
+  dontDrawGrassOnLowerBorder: boolean,
   convertOutput: boolean,
   transparentBackground: boolean,
   backgroundColor: string
