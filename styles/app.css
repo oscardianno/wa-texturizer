@@ -58,3 +58,7 @@ canvas {
 .output-info {
     max-width: 470px;
 }
+
+.texturize-button {
+    margin-left: 10px;
+}

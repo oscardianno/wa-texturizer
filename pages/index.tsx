@@ -168,6 +168,8 @@ export default function Home() {
     React.useState(false);
   const [colorPaletteCount, setColorPaletteCount] = React.useState(0);
   const [downloadUrl, setDownloadUrl] = React.useState("");
+  const [hotReloading, setHotReloading] = React.useState(true);
+  const [renderNow, setRenderNow] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
@@ -178,7 +180,12 @@ export default function Home() {
   }, []);
 
   React.useEffect(() => {
-    if (canvas && sourceImage && !_.isEmpty(images)) {
+    if (
+      (hotReloading || renderNow) &&
+      canvas &&
+      sourceImage &&
+      !_.isEmpty(images)
+    ) {
       // _.defer:
       // Defers invoking the function until the current call stack has cleared,
       // similar to using setTimeout with a delay of 0. Useful for performing
@@ -213,6 +220,8 @@ export default function Home() {
         } else {
           setDownloadUrl(canvas.toDataURL("image/png"));
         }
+
+        if (renderNow) setRenderNow(false);
       });
     }
   }, [
@@ -227,6 +236,8 @@ export default function Home() {
     convertOutput,
     resizeOutput,
     transparentBackground,
+    hotReloading,
+    renderNow,
   ]);
 
   const handleSetConvertOutput = (value: boolean) => {
@@ -380,6 +391,25 @@ export default function Home() {
 
         <div className="block">
           <h3>Output:</h3>
+          <label>
+            <input
+              type="checkbox"
+              id="hot-reload"
+              checked={hotReloading}
+              onChange={(e) => setHotReloading(e.target.checked)}
+            />
+            Enable hot reloading
+          </label>
+          {!hotReloading && (
+            <button
+              className="texturize-button"
+              onClick={() => setRenderNow(true)}
+            >
+              Texturize!
+            </button>
+          )}
+          <br />
+          <br />
           {!!sourceImage &&
             getDownloadInfo(
               downloadUrl,
@@ -389,7 +419,7 @@ export default function Home() {
         </div>
       </div>
 
-      <canvas key={terrain.name} ref={setCanvas} />
+      <canvas ref={setCanvas} />
     </div>
   );
 }
