@@ -123,12 +123,13 @@ function getDownloadInfo(
   }
   return (
     <>
-      <br />
       <a href={downloadUrl} download="wa-texturizer-map.png">
         Download .png
       </a>
+      <br />
+      <br />
       {colorPaletteCount > 0 && (
-        <div className="options">
+        <div className="output-info">
           <div>
             <span>Your map contains </span>
             <span className="highlight">{colorPaletteCount}</span>
@@ -253,7 +254,6 @@ export default function Home() {
         <title>W:A Texturizer</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <img
         className="logo"
         src="texturized-logo.png"
@@ -261,103 +261,133 @@ export default function Home() {
       />
       <br />
 
-      <input
-        type="file"
-        accept="image/*"
-        className="options"
-        onChange={(e) => {
-          handleUploadFile(e);
-        }}
-      />
-      <select
-        value={terrain.name}
-        onChange={(e) =>
-          setTerrain(TERRAINS.find((t) => t.name === e.target.value))
-        }
-      >
-        {TERRAINS.map((t) => (
-          <option key={t.name} value={t.name}>
-            {t.name}
-          </option>
-        ))}
-      </select>
-      <input
-        type="color"
-        className="color-input"
-        value={maskColor}
-        onChange={(e) => setMaskColor(e.target.value)}
-      />
-      <br />
-
-      <label className="options">
-        <input
-          type="checkbox"
-          id="upper-border"
-          checked={dontDrawGrassOnUpperBorder}
-          onChange={(e) => setDontDrawGrassOnUpperBorder(e.target.checked)}
-        />
-        Don't draw grass on top image border
-      </label>
-      <br />
-      <label className="options">
-        <input
-          type="checkbox"
-          id="lower-border"
-          checked={dontDrawGrassOnLowerBorder}
-          onChange={(e) => setDontDrawGrassOnLowerBorder(e.target.checked)}
-        />
-        Don't draw grass on bottom image border
-      </label>
-      <br />
-      <label className="options">
-        <input
-          type="checkbox"
-          id="convert"
-          checked={convertOutput}
-          onChange={(e) => handleSetConvertOutput(e.target.checked)}
-        />
-        Convert output for W:A compatibility
-      </label>
-      <br />
-      <label className="options">
-        <input
-          type="checkbox"
-          id="resize"
-          checked={resizeOutput}
-          disabled={convertOutput}
-          onChange={(e) => setResizeOutput(e.target.checked)}
-        />
-        Resize output to valid W:A map dimensions
-      </label>
-      <br />
-      {resizeOutput && (
-        <div className="resize-options-div">
-          <label className="options">
-            Transparent background
+      <div className="options container">
+        <div className="block">
+          <label>
+            Upload a source image: <br />
             <input
-              type="checkbox"
-              id="resize"
-              checked={transparentBackground}
-              onChange={(e) => setTransparentBackground(e.target.checked)}
-            />
-          </label>
-          <p className="options or">or</p>
-          <label className="options">
-            Set background color
-            <input
-              type="color"
-              className="color-input"
-              value={backgroundColor}
-              onChange={(e) => setBackgroundColor(e.target.value)}
-              disabled={transparentBackground}
+              id="file-input"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                handleUploadFile(e);
+              }}
             />
           </label>
         </div>
-      )}
+
+        <div className="block">
+          <label>
+            Select a terrain texture: <br />
+            <select
+              value={terrain.name}
+              onChange={(e) =>
+                setTerrain(TERRAINS.find((t) => t.name === e.target.value))
+              }
+            >
+              {TERRAINS.map((t) => (
+                <option key={t.name} value={t.name}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="block">
+          <label>
+            Select a mask color: <br />
+            <input
+              type="color"
+              value={maskColor}
+              onChange={(e) => setMaskColor(e.target.value)}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="options container">
+        <div className="block">
+          <h3>Options:</h3>
+          <label>
+            <input
+              type="checkbox"
+              id="upper-border"
+              checked={dontDrawGrassOnUpperBorder}
+              onChange={(e) => setDontDrawGrassOnUpperBorder(e.target.checked)}
+            />
+            Don't draw grass on top image border
+          </label>
+          <br />
+          <label>
+            <input
+              type="checkbox"
+              id="lower-border"
+              checked={dontDrawGrassOnLowerBorder}
+              onChange={(e) => setDontDrawGrassOnLowerBorder(e.target.checked)}
+            />
+            Don't draw grass on bottom image border
+          </label>
+          <br />
+          <label>
+            <input
+              type="checkbox"
+              id="convert"
+              checked={convertOutput}
+              onChange={(e) => handleSetConvertOutput(e.target.checked)}
+            />
+            Convert output for W:A compatibility
+          </label>
+          <br />
+          <label>
+            <input
+              type="checkbox"
+              id="resize"
+              checked={resizeOutput}
+              disabled={convertOutput}
+              onChange={(e) => setResizeOutput(e.target.checked)}
+            />
+            Resize output to valid W:A map dimensions
+          </label>
+          <br />
+          {resizeOutput && (
+            <div className="indented-options">
+              <label>
+                Transparent background
+                <input
+                  type="checkbox"
+                  id="resize"
+                  checked={transparentBackground}
+                  onChange={(e) => setTransparentBackground(e.target.checked)}
+                />
+              </label>
+              <p className="options or">or</p>
+              <label>
+                Set background color:
+                <input
+                  type="color"
+                  className="color-input"
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                  disabled={transparentBackground}
+                />
+              </label>
+            </div>
+          )}
+        </div>
+
+        <div className="block">
+          <h3>Output:</h3>
+          {!!sourceImage &&
+            getDownloadInfo(
+              downloadUrl,
+              colorPaletteCount,
+              transparentBackground
+            )}
+        </div>
+      </div>
 
       <canvas key={terrain.name} ref={setCanvas} />
-      {!!sourceImage &&
-        getDownloadInfo(downloadUrl, colorPaletteCount, transparentBackground)}
     </div>
   );
 }

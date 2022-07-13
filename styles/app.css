@@ -1,5 +1,11 @@
 html {
     background-color: #333333;
+    margin-left: 5px;
+}
+
+h3 {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 canvas {
@@ -9,10 +15,19 @@ canvas {
 
 .logo {
     max-width: 420px;
+    margin-bottom: 10px;
 }
 
 .highlight {
     color: yellow;
+}
+
+.container {
+    display: flex;
+}
+
+.block {
+    margin-right: 40px;
 }
 
 .options {
@@ -21,16 +36,20 @@ canvas {
     font-size: small;
 }
 
-.options.or {
+.or {
     margin-top: 12px;
     margin-left: 20px;
     margin-bottom: 0px;
 }
 
-.resize-options-div {
+.indented-options {
     margin-left: 32px;
 }
 
 .color-input {
     margin-left: 8px;
+}
+
+.output-info {
+    max-width: 500px;
 }
