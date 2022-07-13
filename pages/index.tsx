@@ -254,6 +254,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <img
+        className="logo"
+        src="texturized-logo.png"
+        alt="W:A texturizer logo"
+      />
+      <br />
+
       <input
         type="file"
         accept="image/*"
@@ -281,6 +288,7 @@ export default function Home() {
         onChange={(e) => setMaskColor(e.target.value)}
       />
       <br />
+
       <label className="options">
         <input
           type="checkbox"
@@ -346,6 +354,7 @@ export default function Home() {
           </label>
         </div>
       )}
+
       <canvas key={terrain.name} ref={setCanvas} />
       {!!sourceImage &&
         getDownloadInfo(downloadUrl, colorPaletteCount, transparentBackground)}

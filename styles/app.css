@@ -7,6 +7,10 @@ canvas {
     border: 1px solid white;
 }
 
+.logo {
+    max-width: 420px;
+}
+
 .highlight {
     color: yellow;
 }
