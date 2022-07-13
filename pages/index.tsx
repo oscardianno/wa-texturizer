@@ -131,8 +131,10 @@ function getDownloadInfo(
       {colorPaletteCount > 0 && (
         <div className="output-info">
           <div>
-            <span>Your map contains </span>
-            <span className="highlight">{colorPaletteCount}</span>
+            <span>Generated map contains </span>
+            <span className="highlight">
+              <b>{colorPaletteCount}</b>
+            </span>
             <span> colors</span>
           </div>
           <span>{message}</span>

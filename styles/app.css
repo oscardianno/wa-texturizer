@@ -27,13 +27,18 @@ canvas {
 }
 
 .block {
-    margin-right: 40px;
+    margin-right: 30px;
+    min-width: 300px;
 }
 
 .options {
     color: white;
     font-family: Arial, Helvetica, sans-serif;
     font-size: small;
+}
+
+.options label {
+    font-weight: 600;
 }
 
 .or {
@@ -51,5 +56,5 @@ canvas {
 }
 
 .output-info {
-    max-width: 500px;
+    max-width: 470px;
 }
