@@ -275,53 +275,55 @@ export default function Home() {
       <br />
 
       <div className="options container">
-        <div className="block">
-          <label>
-            Upload a source image: <br />
-            <input
-              id="file-input"
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                handleUploadFile(e);
-              }}
-            />
+        <div className="block top">
+          <label htmlFor="file-input" className="title">
+            Upload a source image:
           </label>
+          <input
+            id="file-input"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              handleUploadFile(e);
+            }}
+          />
         </div>
 
-        <div className="block">
-          <label>
-            Select a terrain texture: <br />
-            <select
-              value={terrain.name}
-              onChange={(e) =>
-                setTerrain(TERRAINS.find((t) => t.name === e.target.value))
-              }
-            >
-              {TERRAINS.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
+        <div className="block narrow top">
+          <label htmlFor="terrain-select" className="title">
+            Select a terrain texture:
           </label>
+          <select
+            id="terrain-select"
+            value={terrain.name}
+            onChange={(e) =>
+              setTerrain(TERRAINS.find((t) => t.name === e.target.value))
+            }
+          >
+            {TERRAINS.map((t) => (
+              <option key={t.name} value={t.name}>
+                {t.name}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="block">
-          <label>
-            Select a mask color: <br />
-            <input
-              type="color"
-              value={maskColor}
-              onChange={(e) => setMaskColor(e.target.value)}
-            />
+        <div className="block top">
+          <label htmlFor="mask-color-select" className="top title">
+            Set the mask color:
           </label>
+          <input
+            id="mask-color-select"
+            type="color"
+            value={maskColor}
+            onChange={(e) => setMaskColor(e.target.value)}
+          />
         </div>
       </div>
 
       <div className="options container">
         <div className="block">
-          <h3>Options:</h3>
+          <h3 className="title">Options:</h3>
           <label>
             <input
               type="checkbox"
@@ -390,7 +392,7 @@ export default function Home() {
         </div>
 
         <div className="block">
-          <h3>Output:</h3>
+          <h3 className="title">Output:</h3>
           <label>
             <input
               type="checkbox"
