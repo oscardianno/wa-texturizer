@@ -326,8 +326,8 @@ export default function Home() {
           <h3 className="title">Options:</h3>
           <label>
             <input
-              type="checkbox"
               id="upper-border"
+              type="checkbox"
               checked={dontDrawGrassOnUpperBorder}
               onChange={(e) => setDontDrawGrassOnUpperBorder(e.target.checked)}
             />
@@ -336,8 +336,8 @@ export default function Home() {
           <br />
           <label>
             <input
-              type="checkbox"
               id="lower-border"
+              type="checkbox"
               checked={dontDrawGrassOnLowerBorder}
               onChange={(e) => setDontDrawGrassOnLowerBorder(e.target.checked)}
             />
@@ -356,8 +356,8 @@ export default function Home() {
           <br />
           <label>
             <input
-              type="checkbox"
               id="resize"
+              type="checkbox"
               checked={resizeOutput}
               disabled={convertOutput}
               onChange={(e) => setResizeOutput(e.target.checked)}
@@ -370,8 +370,8 @@ export default function Home() {
               <label>
                 Transparent background
                 <input
-                  type="checkbox"
                   id="resize"
+                  type="checkbox"
                   checked={transparentBackground}
                   onChange={(e) => setTransparentBackground(e.target.checked)}
                 />
@@ -380,6 +380,7 @@ export default function Home() {
               <label>
                 Set background color:
                 <input
+                  id="background-color"
                   type="color"
                   className="color-input"
                   value={backgroundColor}
@@ -393,15 +394,19 @@ export default function Home() {
 
         <div className="block">
           <h3 className="title">Output:</h3>
-          <label>
-            <input
-              type="checkbox"
-              id="hot-reload"
-              checked={hotReloading}
-              onChange={(e) => setHotReloading(e.target.checked)}
-            />
-            Enable hot reloading
-          </label>
+          <input
+            id="hot-reload"
+            type="checkbox"
+            checked={hotReloading}
+            onChange={(e) => setHotReloading(e.target.checked)}
+          />
+          <label htmlFor="hot-reload">Enable hot reloading</label>
+          <span className="tooltip">
+            <span className="tooltip-text">
+              Automatically re-render the map as options are changed
+            </span>
+            ?
+          </span>
           {!hotReloading && (
             <button
               className="texturize-button"
