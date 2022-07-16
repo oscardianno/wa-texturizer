@@ -170,6 +170,7 @@ export default function Home() {
   const [downloadUrl, setDownloadUrl] = React.useState("");
   const [hotReloading, setHotReloading] = React.useState(true);
   const [renderNow, setRenderNow] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
@@ -186,6 +187,7 @@ export default function Home() {
       sourceImage &&
       !_.isEmpty(images)
     ) {
+      setIsLoading(true);
       // _.defer:
       // Defers invoking the function until the current call stack has cleared,
       // similar to using setTimeout with a delay of 0. Useful for performing
@@ -222,6 +224,7 @@ export default function Home() {
         }
 
         if (renderNow) setRenderNow(false);
+        setIsLoading(false);
       });
     }
   }, [
@@ -415,6 +418,13 @@ export default function Home() {
               Texturize!
             </button>
           )}
+          <div className="loading-icon-container">
+            <img
+              className={`button loading-icon ${isLoading ? "active" : ""}`}
+              src="arrowsdr.gif"
+              alt="Animated loading icon"
+            />
+          </div>
           <br />
           <br />
           {!!sourceImage &&
@@ -426,7 +436,14 @@ export default function Home() {
         </div>
       </div>
 
-      <canvas ref={setCanvas} />
+      <div className="canvas-container">
+        <canvas ref={setCanvas} />
+        <img
+          className={`canvas loading-icon ${isLoading ? "active" : ""}`}
+          src="arrowsdr.gif"
+          alt="Animated loading icon"
+        />
+      </div>
 
       <a href="https://github.com/oscardianno/wa-texturizer" target="_blank">
         <svg

@@ -11,8 +11,39 @@ h3 {
 }
 
 canvas {
-    margin-top: 10px;
     border: 1px solid white;
+}
+
+.canvas-container {
+    margin-top: 10px;
+    position: relative;
+    height: max-content;
+    width: max-content;
+}
+
+.loading-icon-container {
+    display: inline-block;
+    position: relative;
+}
+
+.loading-icon {
+    position: absolute;
+    visibility: hidden;
+}
+
+.loading-icon.active {
+    visibility: visible;
+}
+
+.button.loading-icon {
+    scale: 50%;
+    top: -65px;
+}
+
+.canvas.loading-icon {
+    scale: 70%;
+    top: -10px;
+    right: -15px;
 }
 
 a:link, a:visited {
@@ -42,7 +73,7 @@ a:link, a:visited {
 }
 
 .block.narrow {
-    min-width: 180px;
+    min-width: 210px;
 }
 
 .options {
@@ -85,7 +116,7 @@ a:link, a:visited {
 }
 
 .texturize-button {
-    margin-left: 10px;
+    margin-left: 40px;
 }
 
 .tooltip {
@@ -122,7 +153,7 @@ a:link, a:visited {
 .github-icon {
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 11px;
     width: 40px;
     fill: #808080;
     transition: transform 0.2s;
