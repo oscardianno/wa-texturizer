@@ -1,6 +1,5 @@
 import Head from "next/head";
 import React from "react";
-import NextImage from "next/image";
 import _ from "lodash";
 import {
   texturize,
@@ -126,7 +125,10 @@ function getDownloadInfo(
     <>
       <div className="download-button">
         <a href={downloadUrl} download="wa-texturizer-map.png">
-          <NextImage src="save.png" alt="Save icon" /> <br />
+          <picture>
+            <img src="/save.png" alt="Save icon" />
+          </picture>
+          <br />
           <b>Download PNG</b>
         </a>
       </div>
@@ -272,11 +274,9 @@ export default function Home() {
         <title>W:A Texturizer</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <NextImage
-        id="logo"
-        src="texturized-logo.png"
-        alt="W:A texturizer logo"
-      />
+      <picture>
+        <img id="logo" src="/texturized-logo.png" alt="W:A texturizer logo" />
+      </picture>
       <br />
 
       <div className="container">
@@ -433,11 +433,13 @@ export default function Home() {
               </button>
             )}
             <div className="loading-icon-container">
-              <NextImage
-                className={`button loading-icon ${isLoading ? "active" : ""}`}
-                src="arrowsdr.gif"
-                alt="Animated loading icon"
-              />
+              <picture>
+                <img
+                  className={`button loading-icon ${isLoading ? "active" : ""}`}
+                  src="/arrowsdr.gif"
+                  alt="Animated loading icon"
+                />
+              </picture>
             </div>
             <br />
             <br />
@@ -452,11 +454,13 @@ export default function Home() {
 
         <div className="canvas-container">
           <canvas ref={setCanvas} />
-          <NextImage
-            className={`canvas loading-icon ${isLoading ? "active" : ""}`}
-            src="arrowsdr.gif"
-            alt="Animated loading icon"
-          />
+          <picture>
+            <img
+              className={`canvas loading-icon ${isLoading ? "active" : ""}`}
+              src="/arrowsdr.gif"
+              alt="Animated loading icon"
+            />
+          </picture>
         </div>
       </div>
 
