@@ -8,6 +8,7 @@ html {
     rgba(0, 0, 8, 1) 100%
   );
   background-attachment: fixed;
+  font-size: medium;
 }
 
 #logo {
@@ -75,7 +76,7 @@ canvas {
 
 .vertical.container {
   flex-direction: column;
-  width: 380px;
+  width: 410px;
 }
 
 .section {
@@ -98,12 +99,10 @@ canvas {
 .options {
   color: white;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: small;
 }
 
 .options label {
   font-weight: 600;
-  font-size: 15px;
 }
 
 .top label {
@@ -182,7 +181,7 @@ canvas {
 
 .download-button {
   margin-bottom: 15px;
-  max-width: 125px;
+  max-width: 150px;
   text-align: center;
 }
 
@@ -193,10 +192,6 @@ canvas {
 
 .download-button img {
   height: 50px;
-}
-
-.output-info {
-  font-size: 15px;
 }
 
 #github-icon {

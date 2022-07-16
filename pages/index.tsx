@@ -130,13 +130,13 @@ function getDownloadInfo(
         </a>
       </div>
       {colorPaletteCount > 0 && (
-        <div className="output-info">
+        <div>
           <div>
             <span>Generated map contains </span>
             <span className="highlight">
               <b>{colorPaletteCount}</b>
             </span>
-            <span> colors</span>
+            <span> colors.</span>
           </div>
           <span>{message}</span>
           <span className="highlight"> - </span>
@@ -271,11 +271,7 @@ export default function Home() {
         <title>W:A Texturizer</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <img
-        className="logo"
-        src="texturized-logo.png"
-        alt="W:A texturizer logo"
-      />
+      <img id="logo" src="texturized-logo.png" alt="W:A texturizer logo" />
       <br />
 
       <div className="container">
@@ -386,7 +382,9 @@ export default function Home() {
                       }
                     />
                   </label>
-                  <p className="options or">or</p>
+                  <p id="or" className="options">
+                    or
+                  </p>
                   <div className="background-color-option">
                     <label htmlFor="background-color">
                       Set background color:
@@ -422,7 +420,7 @@ export default function Home() {
             </span>
             {!hotReloading && (
               <button
-                className="texturize-button"
+                className="yellow-button"
                 onClick={() => setRenderNow(true)}
               >
                 <b>Texturize!</b>
@@ -458,7 +456,7 @@ export default function Home() {
 
       <a href="https://github.com/oscardianno/wa-texturizer" target="_blank">
         <svg
-          className="github-icon"
+          id="github-icon"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 496 512"
         >
