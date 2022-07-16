@@ -123,7 +123,7 @@ function getDownloadInfo(
   }
   return (
     <>
-      <div className="download-div">
+      <div className="download-button">
         <a href={downloadUrl} download="wa-texturizer-map.png">
           <img src="save.png" alt="Save icon" /> <br />
           <b>Download PNG</b>
@@ -278,172 +278,182 @@ export default function Home() {
       />
       <br />
 
-      <div className="options container">
-        <div className="block top">
-          <label htmlFor="file-input" className="title">
-            Upload a source image:
-          </label>
-          <input
-            id="file-input"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              handleUploadFile(e);
-            }}
-          />
-        </div>
+      <div className="container">
+        <div className="options vertical container">
+          <div className="section">
+            <div className="block">
+              <label htmlFor="file-input" className="title">
+                Upload a source image:
+              </label>
+              <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  handleUploadFile(e);
+                }}
+              />
+            </div>
+            <div className="block">
+              <label htmlFor="terrain-select" className="title">
+                Select a terrain texture:
+              </label>
+              <select
+                id="terrain-select"
+                value={terrain.name}
+                onChange={(e) =>
+                  setTerrain(TERRAINS.find((t) => t.name === e.target.value))
+                }
+              >
+                {TERRAINS.map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="block">
+              <label htmlFor="mask-color-select" className="top title">
+                Set the mask color:
+              </label>
+              <input
+                id="mask-color-select"
+                type="color"
+                value={maskColor}
+                onChange={(e) => setMaskColor(e.target.value)}
+              />
+            </div>
+          </div>
 
-        <div className="block narrow top">
-          <label htmlFor="terrain-select" className="title">
-            Select a terrain texture:
-          </label>
-          <select
-            id="terrain-select"
-            value={terrain.name}
-            onChange={(e) =>
-              setTerrain(TERRAINS.find((t) => t.name === e.target.value))
-            }
-          >
-            {TERRAINS.map((t) => (
-              <option key={t.name} value={t.name}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="block top">
-          <label htmlFor="mask-color-select" className="top title">
-            Set the mask color:
-          </label>
-          <input
-            id="mask-color-select"
-            type="color"
-            value={maskColor}
-            onChange={(e) => setMaskColor(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="options container">
-        <div className="block">
-          <h3 className="title">Options:</h3>
-          <label>
-            <input
-              id="upper-border"
-              type="checkbox"
-              checked={dontDrawGrassOnUpperBorder}
-              onChange={(e) => setDontDrawGrassOnUpperBorder(e.target.checked)}
-            />
-            Don't draw grass on top image border
-          </label>
-          <br />
-          <label>
-            <input
-              id="lower-border"
-              type="checkbox"
-              checked={dontDrawGrassOnLowerBorder}
-              onChange={(e) => setDontDrawGrassOnLowerBorder(e.target.checked)}
-            />
-            Don't draw grass on bottom image border
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              id="convert"
-              checked={convertOutput}
-              onChange={(e) => handleSetConvertOutput(e.target.checked)}
-            />
-            Convert output for W:A compatibility
-          </label>
-          <br />
-          <label>
-            <input
-              id="resize"
-              type="checkbox"
-              checked={resizeOutput}
-              disabled={convertOutput}
-              onChange={(e) => setResizeOutput(e.target.checked)}
-            />
-            Resize output to valid W:A map dimensions
-          </label>
-          <br />
-          {resizeOutput && (
-            <div className="indented-options">
+          <div className="section">
+            <h3 className="title">Options:</h3>
+            <div className="block">
               <label>
-                Transparent background
+                <input
+                  id="upper-border"
+                  type="checkbox"
+                  checked={dontDrawGrassOnUpperBorder}
+                  onChange={(e) =>
+                    setDontDrawGrassOnUpperBorder(e.target.checked)
+                  }
+                />
+                Don't draw grass on top image border
+              </label>
+              <br />
+              <label>
+                <input
+                  id="lower-border"
+                  type="checkbox"
+                  checked={dontDrawGrassOnLowerBorder}
+                  onChange={(e) =>
+                    setDontDrawGrassOnLowerBorder(e.target.checked)
+                  }
+                />
+                Don't draw grass on bottom image border
+              </label>
+              <br />
+              <label>
+                <input
+                  type="checkbox"
+                  id="convert"
+                  checked={convertOutput}
+                  onChange={(e) => handleSetConvertOutput(e.target.checked)}
+                />
+                Convert output for W:A compatibility
+              </label>
+              <br />
+              <label>
                 <input
                   id="resize"
                   type="checkbox"
-                  checked={transparentBackground}
-                  onChange={(e) => setTransparentBackground(e.target.checked)}
+                  checked={resizeOutput}
+                  disabled={convertOutput}
+                  onChange={(e) => setResizeOutput(e.target.checked)}
                 />
+                Resize output to valid W:A map dimensions
               </label>
-              <p className="options or">or</p>
-              <label>
-                Set background color:
-                <input
-                  id="background-color"
-                  type="color"
-                  className="color-input"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  disabled={transparentBackground}
-                />
-              </label>
+              <br />
+              {resizeOutput && (
+                <div className="indented-options">
+                  <label>
+                    Transparent background
+                    <input
+                      id="resize"
+                      type="checkbox"
+                      checked={transparentBackground}
+                      onChange={(e) =>
+                        setTransparentBackground(e.target.checked)
+                      }
+                    />
+                  </label>
+                  <p className="options or">or</p>
+                  <div className="background-color-option">
+                    <label htmlFor="background-color">
+                      Set background color:
+                    </label>
+                    <input
+                      id="background-color"
+                      type="color"
+                      className="color-input"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      disabled={transparentBackground}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-
-        <div className="block">
-          <h3 className="title">Output:</h3>
-          <input
-            id="hot-reload"
-            type="checkbox"
-            checked={hotReloading}
-            onChange={(e) => setHotReloading(e.target.checked)}
-          />
-          <label htmlFor="hot-reload">Enable hot reloading</label>
-          <span className="tooltip">
-            <span className="tooltip-text">
-              Automatically re-render the map as options are changed
-            </span>
-            ?
-          </span>
-          {!hotReloading && (
-            <button
-              className="texturize-button"
-              onClick={() => setRenderNow(true)}
-            >
-              <b>Texturize!</b>
-            </button>
-          )}
-          <div className="loading-icon-container">
-            <img
-              className={`button loading-icon ${isLoading ? "active" : ""}`}
-              src="arrowsdr.gif"
-              alt="Animated loading icon"
-            />
           </div>
-          <br />
-          <br />
-          {!!sourceImage &&
-            getDownloadInfo(
-              downloadUrl,
-              colorPaletteCount,
-              transparentBackground
-            )}
-        </div>
-      </div>
 
-      <div className="canvas-container">
-        <canvas ref={setCanvas} />
-        <img
-          className={`canvas loading-icon ${isLoading ? "active" : ""}`}
-          src="arrowsdr.gif"
-          alt="Animated loading icon"
-        />
+          <div className="section">
+            <h3 className="title">Output:</h3>
+            <input
+              id="hot-reload"
+              type="checkbox"
+              checked={hotReloading}
+              onChange={(e) => setHotReloading(e.target.checked)}
+            />
+            <label htmlFor="hot-reload">Enable hot reloading</label>
+            <span className="tooltip">
+              <span className="tooltip-text">
+                Automatically re-render the map as options are changed
+              </span>
+              ?
+            </span>
+            {!hotReloading && (
+              <button
+                className="texturize-button"
+                onClick={() => setRenderNow(true)}
+              >
+                <b>Texturize!</b>
+              </button>
+            )}
+            <div className="loading-icon-container">
+              <img
+                className={`button loading-icon ${isLoading ? "active" : ""}`}
+                src="arrowsdr.gif"
+                alt="Animated loading icon"
+              />
+            </div>
+            <br />
+            <br />
+            {!!sourceImage &&
+              getDownloadInfo(
+                downloadUrl,
+                colorPaletteCount,
+                transparentBackground
+              )}
+          </div>
+        </div>
+
+        <div className="canvas-container">
+          <canvas ref={setCanvas} />
+          <img
+            className={`canvas loading-icon ${isLoading ? "active" : ""}`}
+            src="arrowsdr.gif"
+            alt="Animated loading icon"
+          />
+        </div>
       </div>
 
       <a href="https://github.com/oscardianno/wa-texturizer" target="_blank">

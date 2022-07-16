@@ -1,185 +1,215 @@
 html {
-    margin-left: 5px;
-    background: rgb(0,0,140);
-    background: linear-gradient(0deg, rgba(0,0,140,1) 0%, rgba(0,0,49,1) 80%, rgba(0,0,8,1) 100%); 
-    background-attachment: fixed;
+  margin-left: 5px;
+  background: rgb(0, 0, 140);
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 140, 1) 0%,
+    rgba(0, 0, 49, 1) 80%,
+    rgba(0, 0, 8, 1) 100%
+  );
+  background-attachment: fixed;
+}
+
+#logo {
+  max-width: 460px;
+  margin-bottom: 5px;
 }
 
 h3 {
-    margin-top: 5px;
-    margin-bottom: 5px;
+  margin-top: 0px;
 }
 
-canvas {
-    border: 1px solid white;
-}
-
-.canvas-container {
-    margin-top: 10px;
-    position: relative;
-    height: max-content;
-    width: max-content;
-}
-
-.loading-icon-container {
-    display: inline-block;
-    position: relative;
-}
-
-.loading-icon {
-    position: absolute;
-    visibility: hidden;
-}
-
-.loading-icon.active {
-    visibility: visible;
-}
-
-.button.loading-icon {
-    scale: 50%;
-    top: -65px;
-}
-
-.canvas.loading-icon {
-    scale: 50%;
-    top: -10px;
-    right: -15px;
-}
-
-a:link, a:visited {
-    color: dodgerblue
-}
-
-.logo {
-    max-width: 420px;
-    margin-bottom: 10px;
+a:link,
+a:visited {
+  color: dodgerblue;
 }
 
 .title {
-    color: #808080;
+  color: #808080;
+  margin-bottom: 5px;
 }
 
 .highlight {
-    color: yellow;
+  color: yellow;
+}
+
+.canvas-container {
+  position: relative;
+  height: max-content;
+  width: max-content;
+}
+
+canvas {
+  border: 2px solid #808080;
+  border-radius: 6px;
+}
+
+.loading-icon-container {
+  display: inline-block;
+  position: relative;
+}
+
+.loading-icon {
+  position: absolute;
+  visibility: hidden;
+}
+
+.loading-icon.active {
+  visibility: visible;
+}
+
+.button.loading-icon {
+  scale: 50%;
+  top: -65px;
+}
+
+.canvas.loading-icon {
+  scale: 50%;
+  top: -10px;
+  right: -15px;
 }
 
 .container {
-    display: flex;
+  display: flex;
+}
+
+.vertical.container {
+  flex-direction: column;
+  width: 380px;
+}
+
+.section {
+  padding: 15px 15px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  border: 2px solid #808080;
+  border-radius: 6px;
 }
 
 .block {
-    margin-right: 30px;
-    min-width: 330px;
+  display: flex;
+  flex-direction: column;
 }
 
-.block.narrow {
-    min-width: 210px;
+.block:not(:last-child) {
+  margin-bottom: 10px;
 }
 
 .options {
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: small;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
 }
 
 .options label {
-    font-weight: 600;
-    font-size: 15px;
+  font-weight: 600;
+  font-size: 15px;
 }
 
-.block.top label {
-    display:block;
-    margin-bottom: 8px;
+.top label {
+  display: block;
+  margin-bottom: 8px;
 }
 
-.block.top input {
-    display: block;
+.top input {
+  display: block;
 }
 
-.or {
-    margin-top: 12px;
-    margin-left: 20px;
-    margin-bottom: 0px;
+#terrain-select {
+  max-width: max-content;
 }
 
 .indented-options {
-    margin-left: 32px;
+  margin-top: 6px;
+  margin-left: 40px;
+}
+
+#or {
+  position: absolute;
+  margin-top: 2px;
+  margin-left: 20px;
+  margin-bottom: 0px;
 }
 
 .color-input {
-    margin-left: 8px;
+  margin-left: 8px;
 }
 
-.download-div {
-    margin-bottom: 15px;
-    max-width: 150px;
-    text-align: center;
-}
-
-.download-div a:link {
-    color: #fbd416;
-    text-decoration-line: none;
-}
-
-.download-div img {
-    height: 50px;
-}
-
-.output-info {
-    max-width: 450px;
-    font-size: 15px;
-}
-
-.texturize-button {
-    margin-left: 40px;
-    background-color: #eedc65;
-    border-radius: 2px;
-    border-color: #fbcb23;
-    padding: 2px 6px;
+.background-color-option {
+  display: flex;
+  align-items: baseline;
+  margin-top: 10px;
 }
 
 .tooltip {
-    position: relative;
-    display: inline-block;
-    margin-left: 8px;
-    border-radius: 100px;
-    padding: 1px 6px;
-    border: 2px dotted white;
+  position: relative;
+  display: inline-block;
+  margin-left: 8px;
+  border-radius: 100px;
+  padding: 1px 6px;
+  border: 2px dotted white;
 }
 
 .tooltip .tooltip-text {
-    visibility: hidden;
-    color: white;
-    background-color: #555;
-    text-align: center;
-    width: 170px;
-    border-radius: 2px;
-    padding: 5px 10px;
-    position: absolute;
-    bottom: 150%;
-    left: 50%;
-    margin-left: -70px;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.3s;
+  visibility: hidden;
+  color: white;
+  background-color: #555;
+  text-align: center;
+  width: 170px;
+  border-radius: 2px;
+  padding: 5px 10px;
+  position: absolute;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -70px;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
-.github-icon {
-    position: absolute;
-    top: 10px;
-    right: 11px;
-    width: 40px;
-    fill: #808080;
-    transition: transform 0.2s;
-    transform: scale(1);
+.yellow-button {
+  margin-left: 40px;
+  background-color: #eedc65;
+  border-radius: 2px;
+  border-color: #fbcb23;
+  padding: 2px 6px;
 }
 
-.github-icon:hover {
-    fill: white;
-    transform: scale(1.1);
+.download-button {
+  margin-bottom: 15px;
+  max-width: 125px;
+  text-align: center;
+}
+
+.download-button a:link {
+  color: #fbd416;
+  text-decoration-line: none;
+}
+
+.download-button img {
+  height: 50px;
+}
+
+.output-info {
+  font-size: 15px;
+}
+
+#github-icon {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  width: 40px;
+  fill: #808080;
+  transition: transform 0.2s;
+  transform: scale(1);
+}
+
+#github-icon:hover {
+  fill: white;
+  transform: scale(1.1);
 }
