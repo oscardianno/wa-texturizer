@@ -13,7 +13,8 @@ html {
 
 #logo {
   max-width: 460px;
-  margin-bottom: 5px;
+  margin-top: 10px;
+  margin-bottom: 15px;
 }
 
 h3 {
@@ -76,15 +77,27 @@ canvas {
 
 .vertical.container {
   flex-direction: column;
-  width: 410px;
+  width: 415px;
 }
 
 .section {
-  padding: 15px 15px;
-  margin-right: 20px;
-  margin-bottom: 20px;
+  position: relative;
+  padding: 15px;
+  padding-top: 25px;
+  margin-right: 25px;
+  margin-bottom: 25px;
   border: 2px solid #808080;
   border-radius: 6px;
+}
+
+.section h3 {
+  position: absolute;
+  top: -15px;
+  left: 15px;
+  background-color: black;
+  border: 2px solid #808080;
+  border-radius: 6px;
+  padding: 2px 10px;
 }
 
 .block {

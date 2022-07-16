@@ -117,7 +117,7 @@ function getDownloadInfo(
         "the background gradient will appear dithered.";
     } else {
       message =
-        "It will not load. You'll have to use some " +
+        "It will not load in W:A. You'll have to use some " +
         "image editor software to reduce the number of colors.";
     }
   }
@@ -277,6 +277,7 @@ export default function Home() {
       <div className="container">
         <div className="options vertical container">
           <div className="section">
+            <h3 className="title">Input</h3>
             <div className="block">
               <label htmlFor="file-input" className="title">
                 Upload a source image:
@@ -322,7 +323,7 @@ export default function Home() {
           </div>
 
           <div className="section">
-            <h3 className="title">Options:</h3>
+            <h3 className="title">Options</h3>
             <div className="block">
               <label>
                 <input
@@ -404,7 +405,7 @@ export default function Home() {
           </div>
 
           <div className="section">
-            <h3 className="title">Output:</h3>
+            <h3 className="title">Output</h3>
             <input
               id="hot-reload"
               type="checkbox"
