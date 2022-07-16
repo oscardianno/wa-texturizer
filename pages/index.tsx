@@ -123,11 +123,12 @@ function getDownloadInfo(
   }
   return (
     <>
-      <a href={downloadUrl} download="wa-texturizer-map.png">
-        Download .png
-      </a>
-      <br />
-      <br />
+      <div className="download-div">
+        <a href={downloadUrl} download="wa-texturizer-map.png">
+          <img src="save.png" alt="Save icon" /> <br />
+          <b>Download PNG</b>
+        </a>
+      </div>
       {colorPaletteCount > 0 && (
         <div className="output-info">
           <div>
@@ -415,7 +416,7 @@ export default function Home() {
               className="texturize-button"
               onClick={() => setRenderNow(true)}
             >
-              Texturize!
+              <b>Texturize!</b>
             </button>
           )}
           <div className="loading-icon-container">
