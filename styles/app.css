@@ -41,7 +41,7 @@ canvas {
 }
 
 .canvas.loading-icon {
-    scale: 70%;
+    scale: 50%;
     top: -10px;
     right: -15px;
 }
