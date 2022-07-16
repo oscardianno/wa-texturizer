@@ -1,5 +1,6 @@
 import Head from "next/head";
 import React from "react";
+import NextImage from "next/image";
 import _ from "lodash";
 import {
   texturize,
@@ -125,7 +126,7 @@ function getDownloadInfo(
     <>
       <div className="download-button">
         <a href={downloadUrl} download="wa-texturizer-map.png">
-          <img src="save.png" alt="Save icon" /> <br />
+          <NextImage src="save.png" alt="Save icon" /> <br />
           <b>Download PNG</b>
         </a>
       </div>
@@ -140,7 +141,7 @@ function getDownloadInfo(
           </div>
           <span>{message}</span>
           <span className="highlight"> - </span>
-          <a href={wikiSource} target="_blank">
+          <a href={wikiSource} target="_blank" rel="noreferrer">
             Read more
           </a>
         </div>
@@ -271,7 +272,11 @@ export default function Home() {
         <title>W:A Texturizer</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <img id="logo" src="texturized-logo.png" alt="W:A texturizer logo" />
+      <NextImage
+        id="logo"
+        src="texturized-logo.png"
+        alt="W:A texturizer logo"
+      />
       <br />
 
       <div className="container">
@@ -334,7 +339,7 @@ export default function Home() {
                     setDontDrawGrassOnUpperBorder(e.target.checked)
                   }
                 />
-                Don't draw grass on top image border
+                {"Don't draw grass on top image border"}
               </label>
               <br />
               <label>
@@ -346,7 +351,7 @@ export default function Home() {
                     setDontDrawGrassOnLowerBorder(e.target.checked)
                   }
                 />
-                Don't draw grass on bottom image border
+                {"Don't draw grass on bottom image border"}
               </label>
               <br />
               <label>
@@ -428,7 +433,7 @@ export default function Home() {
               </button>
             )}
             <div className="loading-icon-container">
-              <img
+              <NextImage
                 className={`button loading-icon ${isLoading ? "active" : ""}`}
                 src="arrowsdr.gif"
                 alt="Animated loading icon"
@@ -447,7 +452,7 @@ export default function Home() {
 
         <div className="canvas-container">
           <canvas ref={setCanvas} />
-          <img
+          <NextImage
             className={`canvas loading-icon ${isLoading ? "active" : ""}`}
             src="arrowsdr.gif"
             alt="Animated loading icon"
@@ -455,7 +460,11 @@ export default function Home() {
         </div>
       </div>
 
-      <a href="https://github.com/oscardianno/wa-texturizer" target="_blank">
+      <a
+        href="https://github.com/oscardianno/wa-texturizer"
+        target="_blank"
+        rel="noreferrer"
+      >
         <svg
           id="github-icon"
           xmlns="http://www.w3.org/2000/svg"
