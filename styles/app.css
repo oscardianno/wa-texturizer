@@ -76,6 +76,8 @@ canvas {
 }
 
 .vertical.container {
+  margin-left: 10px;
+  margin-top: 13px;
   flex-direction: column;
   width: 415px;
 }
@@ -211,7 +213,7 @@ canvas {
   position: absolute;
   top: 10px;
   right: 11px;
-  width: 40px;
+  width: 35px;
   fill: #808080;
   transition: transform 0.2s;
   transform: scale(1);
