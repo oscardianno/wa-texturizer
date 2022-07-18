@@ -341,7 +341,6 @@ export default function Home() {
                 />
                 {"Don't draw grass on top image border"}
               </label>
-              <br />
               <label>
                 <input
                   id="lower-border"
@@ -353,7 +352,6 @@ export default function Home() {
                 />
                 {"Don't draw grass on bottom image border"}
               </label>
-              <br />
               <label>
                 <input
                   type="checkbox"
@@ -363,7 +361,6 @@ export default function Home() {
                 />
                 Convert output for W:A compatibility
               </label>
-              <br />
               <label>
                 <input
                   id="resize"
@@ -374,7 +371,6 @@ export default function Home() {
                 />
                 Resize output to valid W:A map dimensions
               </label>
-              <br />
               {resizeOutput && (
                 <div className="indented-options">
                   <label>
