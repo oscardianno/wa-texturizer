@@ -138,7 +138,10 @@ function getButtonSection(
         </div>
 
         {!hotReloading && (
-          <button className="yellow-button" onClick={() => setRenderNow(true)}>
+          <button
+            className="yellow-button"
+            onClick={() => setRenderNow({ value: true })}
+          >
             Texturize!
           </button>
         )}
@@ -184,7 +187,7 @@ export default function Home() {
   const [colorPaletteCount, setColorPaletteCount] = React.useState(0);
   const [downloadUrl, setDownloadUrl] = React.useState("");
   const [hotReloading, setHotReloading] = React.useState(true);
-  const [renderNow, setRenderNow] = React.useState(false);
+  const [renderNow, setRenderNow] = React.useState({ value: false });
   const [isLoading, setIsLoading] = React.useState(false);
   const [firstLoad, setFirstLoad] = React.useState(true);
   const reRenderMs = firstLoad ? 0 : 1500;
@@ -200,7 +203,7 @@ export default function Home() {
   useDebouncedEffect(
     () => {
       if (
-        (hotReloading || renderNow) &&
+        (hotReloading || renderNow.value) &&
         canvas &&
         sourceImage &&
         !_.isEmpty(images)
@@ -243,8 +246,8 @@ export default function Home() {
             }
 
             setIsLoading(false);
-            setRenderNow(false);
             setFirstLoad(false);
+            if (!hotReloading) setRenderNow({ value: false });
           });
         }, 100);
       }
