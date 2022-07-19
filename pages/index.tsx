@@ -6,6 +6,7 @@ import {
   resize,
   convertOutputToIndexedPng,
 } from "./../src/image-processing";
+import { useDebouncedEffect } from "../src/hooks";
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [
@@ -175,6 +176,8 @@ export default function Home() {
   const [hotReloading, setHotReloading] = React.useState(false);
   const [renderNow, setRenderNow] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [firstLoad, setFirstLoad] = React.useState(true);
+  const reRenderMs = firstLoad ? 0 : 1500;
 
   React.useEffect(() => {
     (async () => {
@@ -184,68 +187,75 @@ export default function Home() {
     })();
   }, []);
 
-  React.useEffect(() => {
-    if (
-      (hotReloading || renderNow) &&
-      canvas &&
-      sourceImage &&
-      !_.isEmpty(images)
-    ) {
-      setIsLoading(true);
-      // _.defer:
-      // Defers invoking the function until the current call stack has cleared,
-      // similar to using setTimeout with a delay of 0. Useful for performing
-      // expensive computations or HTML rendering in chunks without blocking
-      // the UI thread from updating.
-      _.defer(() => {
-        const colorPalette = texturize(
-          terrain.name,
-          canvas,
-          sourceImage,
-          images[`Terrain/${terrain.name}/text.png`],
-          images[`Terrain/${terrain.name}/grass.png`],
-          maskColor,
-          dontDrawGrassOnUpperBorder,
-          dontDrawGrassOnLowerBorder,
-          convertOutput,
-          transparentBackground,
-          backgroundColor
-        );
+  useDebouncedEffect(
+    () => {
+      if (
+        (hotReloading || renderNow) &&
+        canvas &&
+        sourceImage &&
+        !_.isEmpty(images)
+      ) {
+        setIsLoading(true);
+        setTimeout(() => {
+          // _.defer:
+          // Defers invoking the function until the current call stack has cleared,
+          // similar to using setTimeout with a delay of 0. Useful for performing
+          // expensive computations or HTML rendering in chunks without blocking
+          // the UI thread from updating.
+          _.defer(() => {
+            const colorPalette = texturize(
+              terrain.name,
+              canvas,
+              sourceImage,
+              images[`Terrain/${terrain.name}/text.png`],
+              images[`Terrain/${terrain.name}/grass.png`],
+              maskColor,
+              dontDrawGrassOnUpperBorder,
+              dontDrawGrassOnLowerBorder,
+              convertOutput,
+              transparentBackground,
+              backgroundColor
+            );
 
-        if (resizeOutput)
-          resize(canvas, transparentBackground, backgroundColor);
+            if (resizeOutput)
+              resize(canvas, transparentBackground, backgroundColor);
 
-        setColorPaletteCount(colorPalette.length);
-        if (convertOutput) {
-          convertOutputToIndexedPng(
-            canvas,
-            terrain.index,
-            colorPalette,
-            setDownloadUrl
-          );
-        } else {
-          setDownloadUrl(canvas.toDataURL("image/png"));
-        }
+            setColorPaletteCount(colorPalette.length);
+            if (convertOutput) {
+              convertOutputToIndexedPng(
+                canvas,
+                terrain.index,
+                colorPalette,
+                setDownloadUrl
+              );
+            } else {
+              setDownloadUrl(canvas.toDataURL("image/png"));
+            }
 
-        if (renderNow) setRenderNow(false);
-        setIsLoading(false);
-      });
-    }
-  }, [
-    terrain,
-    canvas,
-    sourceImage,
-    images,
-    maskColor,
-    backgroundColor,
-    dontDrawGrassOnUpperBorder,
-    dontDrawGrassOnLowerBorder,
-    convertOutput,
-    resizeOutput,
-    transparentBackground,
-    hotReloading,
-    renderNow,
-  ]);
+            setIsLoading(false);
+            setRenderNow(false);
+            setFirstLoad(false);
+          });
+        }, 100);
+      }
+    },
+    [
+      terrain,
+      canvas,
+      sourceImage,
+      images,
+      maskColor,
+      backgroundColor,
+      dontDrawGrassOnUpperBorder,
+      dontDrawGrassOnLowerBorder,
+      convertOutput,
+      resizeOutput,
+      transparentBackground,
+      hotReloading,
+      renderNow,
+    ],
+    reRenderMs
+  );
 
   const handleSetConvertOutput = (value: boolean) => {
     setConvertOutput(value);
