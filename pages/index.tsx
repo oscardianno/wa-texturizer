@@ -94,10 +94,12 @@ function useQueryParam(
   ];
 }
 
-function getDownloadInfo(
+function getButtonSection(
   downloadUrl: string,
+  hotReloading: boolean,
   colorPaletteCount: number,
-  transparentBackground: boolean
+  transparentBackground: boolean,
+  setRenderNow: Function
 ) {
   let message = "";
   let wikiSource = "https://worms2d.info/Colour_map#Colour_limitation";
@@ -124,14 +126,22 @@ function getDownloadInfo(
   }
   return (
     <>
-      <div className="download-button">
-        <a href={downloadUrl} download="wa-texturizer-map.png">
-          <picture>
-            <img src="/save.png" alt="Save icon" />
-          </picture>
-          <br />
-          <b>Download PNG</b>
-        </a>
+      <div className="container button-section">
+        <div className="download-button">
+          <a href={downloadUrl} download="wa-texturizer-map.png">
+            <picture>
+              <img src="/save.png" alt="Save icon" />
+            </picture>
+            <br />
+            <b>Download PNG</b>
+          </a>
+        </div>
+
+        {!hotReloading && (
+          <button className="yellow-button" onClick={() => setRenderNow(true)}>
+            Texturize!
+          </button>
+        )}
       </div>
       {colorPaletteCount > 0 && (
         <div>
@@ -450,18 +460,10 @@ export default function Home() {
               </span>
               ?
             </span>
-            {!hotReloading && (
-              <button
-                className="yellow-button"
-                onClick={() => setRenderNow(true)}
-              >
-                <b>Texturize!</b>
-              </button>
-            )}
             <div className="loading-icon-container">
               <picture>
                 <img
-                  className={`button loading-icon ${isLoading ? "active" : ""}`}
+                  className={`canvas loading-icon ${isLoading ? "active" : ""}`}
                   src="/arrowsdr.gif"
                   alt="Animated loading icon"
                 />
@@ -470,10 +472,12 @@ export default function Home() {
             <br />
             <br />
             {!!sourceImage &&
-              getDownloadInfo(
+              getButtonSection(
                 downloadUrl,
+                hotReloading,
                 colorPaletteCount,
-                transparentBackground
+                transparentBackground,
+                setRenderNow
               )}
           </div>
         </div>

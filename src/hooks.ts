@@ -11,10 +11,6 @@ export function useDebouncedEffect(
   // The source of truth will always be _dependencyRef.current
   const [_dependency, _setDependency] = React.useState(dependency);
 
-  React.useEffect(() => {
-    console.log("DEBUG - DebouncedEffect re-rendering!");
-  });
-
   const debouncedDependencyChangeHandler = React.useMemo(
     () =>
       _.debounce(
