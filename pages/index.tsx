@@ -173,8 +173,8 @@ export default function Home() {
     React.useState(false);
   const [colorPaletteCount, setColorPaletteCount] = React.useState(0);
   const [downloadUrl, setDownloadUrl] = React.useState("");
-  const [hotReloading, setHotReloading] = React.useState(false);
-  const [renderNow, setRenderNow] = React.useState(true);
+  const [hotReloading, setHotReloading] = React.useState(true);
+  const [renderNow, setRenderNow] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [firstLoad, setFirstLoad] = React.useState(true);
   const reRenderMs = firstLoad ? 0 : 1500;
