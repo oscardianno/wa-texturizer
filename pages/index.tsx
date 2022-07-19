@@ -274,6 +274,24 @@ export default function Home() {
     reader.readAsDataURL(file);
   };
 
+  const handleSetBackgroundColor = (color: string) => {
+    setBackgroundColor(color);
+  };
+
+  const handleSetMaskColor = (color: string) => {
+    setMaskColor(color);
+  };
+
+  const debouncedMaskColorHandler = React.useMemo(
+    () => _.debounce(handleSetMaskColor, 500),
+    []
+  );
+
+  const debouncedBackgroundColorHandler = React.useMemo(
+    () => _.debounce(handleSetBackgroundColor, 500),
+    []
+  );
+
   if (!terrain) {
     return null;
   }
@@ -332,7 +350,7 @@ export default function Home() {
                 id="mask-color-select"
                 type="color"
                 value={maskColor}
-                onChange={(e) => setMaskColor(e.target.value)}
+                onChange={(e) => debouncedMaskColorHandler(e.target.value)}
               />
             </div>
           </div>
@@ -406,7 +424,9 @@ export default function Home() {
                       type="color"
                       className="color-input"
                       value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      onChange={(e) =>
+                        debouncedBackgroundColorHandler(e.target.value)
+                      }
                       disabled={transparentBackground}
                     />
                   </div>
