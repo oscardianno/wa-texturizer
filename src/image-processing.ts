@@ -83,7 +83,7 @@ export function texturize(
   // These functions find the offset to where the first grass pixel is found
   // By checking each pixel in 'y' until it's color is not close-to-black
   let grassTopOffset = 0;
-  for (let y = 0; y < grassImage.height; y++) {
+  for (let y = 0, height = grassImage.height; y < height; y++) {
     if (!closeToBlack(getPixel(grassTopImageData, 0, y))) {
       break;
     }
@@ -124,7 +124,7 @@ export function texturize(
   }
 
   // Texturization begins - scans horizontally in X from left to right
-  for (let x = 0; x < sourceImage.width; x++) {
+  for (let x = 0, width = sourceImage.width; x < width; x++) {
     // It applies grass from down to up, so position at the bottom pixel of the grass-bottom
     let below = grassImage.height - grassBottomOffset - 1;
     // Scan vertically in Y from down to up (to apply grassBottom)
