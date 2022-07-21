@@ -356,7 +356,6 @@ function colorEqual(c1: Color, c2: Color): boolean {
   return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2];
 }
 
-// Checks if a color is close to black
 function closeToBlack([r, g, b]: Color): boolean {
   return r < 40 && g < 40 && b < 40;
 }
