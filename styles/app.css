@@ -216,6 +216,11 @@ canvas {
   height: 50px;
 }
 
+#render-time {
+  font-size: small;
+  color: #808080;
+}
+
 #github-icon {
   position: absolute;
   top: 10px;

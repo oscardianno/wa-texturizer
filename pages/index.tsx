@@ -7,6 +7,7 @@ import {
   convertOutputToIndexedPng,
 } from "./../src/image-processing";
 import { useDebouncedEffect } from "../src/hooks";
+import { convertMsToTime } from "../src/utils";
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [
@@ -99,7 +100,8 @@ function getButtonSection(
   hotReloading: boolean,
   colorPaletteCount: number,
   transparentBackground: boolean,
-  setRenderNow: Function
+  setRenderNow: Function,
+  renderTime: string
 ) {
   let message = "";
   let wikiSource = "https://worms2d.info/Colour_map#Colour_limitation";
@@ -162,6 +164,9 @@ function getButtonSection(
           </a>
         </div>
       )}
+      <span id="render-time">
+        <b>Render time:</b> {renderTime}
+      </span>
     </>
   );
 }
@@ -190,6 +195,7 @@ export default function Home() {
   const [renderNow, setRenderNow] = React.useState({ value: false });
   const [isLoading, setIsLoading] = React.useState(false);
   const [firstLoad, setFirstLoad] = React.useState(true);
+  const [renderTime, setRenderTime] = React.useState("");
   const reRenderMs = firstLoad ? 0 : 1500;
 
   React.useEffect(() => {
@@ -216,6 +222,8 @@ export default function Home() {
           // expensive computations or HTML rendering in chunks without blocking
           // the UI thread from updating.
           _.defer(() => {
+            const startTime = performance.now();
+
             const colorPalette = texturize(
               terrain.name,
               canvas,
@@ -244,6 +252,9 @@ export default function Home() {
             } else {
               setDownloadUrl(canvas.toDataURL("image/png"));
             }
+
+            const endTime = performance.now();
+            setRenderTime(convertMsToTime(endTime - startTime));
 
             setIsLoading(false);
             setFirstLoad(false);
@@ -480,7 +491,8 @@ export default function Home() {
                 hotReloading,
                 colorPaletteCount,
                 transparentBackground,
-                setRenderNow
+                setRenderNow,
+                renderTime
               )}
           </div>
         </div>
