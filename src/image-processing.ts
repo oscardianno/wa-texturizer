@@ -352,13 +352,8 @@ function setPixelRow(
   }
 }
 
-// Checks if two given colors are equal
 function colorEqual(c1: Color, c2: Color): boolean {
-  // return (!c1 && !c2)
-  // This would return true if both colors are falsey, otherwise:
-  // _.every(c1, (c, i) => c === c2[i]);
-  // Returns true IF every element in c1 collection is equal to one in c2
-  return (!c1 && !c2) || _.every(c1, (c, i) => c === c2[i]);
+  return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2];
 }
 
 // Checks if a color is close to black
