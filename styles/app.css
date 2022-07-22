@@ -1,5 +1,5 @@
-html {
-  margin-left: 5px;
+body {
+  margin-left: 15px;
   background: rgb(0, 0, 140);
   background: linear-gradient(
     0deg,
@@ -9,6 +9,10 @@ html {
   );
   background-attachment: fixed;
   font-size: medium;
+}
+
+[data-darkreader-mode="dynamic"] body {
+  background: none;
 }
 
 #logo {

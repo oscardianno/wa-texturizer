@@ -324,6 +324,7 @@ export default function Home() {
       <Head>
         <title>W:A Texturizer</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="darkreader-lock" />
       </Head>
       <picture>
         <img id="logo" src="/texturized-logo.png" alt="W:A texturizer logo" />
