@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import _ from "lodash";
 import {
   texturize,
@@ -77,9 +77,9 @@ function useQueryParam(
   key: string,
   defaultValue?: string
 ): [value: string, set: (value: string) => void] {
-  const [value, setValue] = React.useState<string>();
+  const [value, setValue] = useState<string>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setValue(params.get(key) ?? defaultValue);
   }, []);
@@ -172,33 +172,32 @@ function getButtonSection(
 }
 
 export default function Home() {
-  const [sourceImage, setSourceImage] = React.useState<HTMLImageElement>(null);
-  const [terrain, setTerrain] = React.useState(TERRAINS[6]);
+  const [sourceImage, setSourceImage] = useState<HTMLImageElement>(null);
+  const [terrain, setTerrain] = useState(TERRAINS[6]);
   const [maskColor, setMaskColor] = useQueryParam("maskColor", "#ffffff");
   const [backgroundColor, setBackgroundColor] = useQueryParam(
     "backgroundColor",
     "#000000"
   );
-  const [canvas, setCanvas] = React.useState<HTMLCanvasElement>();
-  const [images, setImages] = React.useState({});
+  const [canvas, setCanvas] = useState<HTMLCanvasElement>();
+  const [images, setImages] = useState({});
   const [dontDrawGrassOnUpperBorder, setDontDrawGrassOnUpperBorder] =
-    React.useState(false);
+    useState(false);
   const [dontDrawGrassOnLowerBorder, setDontDrawGrassOnLowerBorder] =
-    React.useState(false);
-  const [convertOutput, setConvertOutput] = React.useState(false);
-  const [resizeOutput, setResizeOutput] = React.useState(false);
-  const [transparentBackground, setTransparentBackground] =
-    React.useState(false);
-  const [colorPaletteCount, setColorPaletteCount] = React.useState(0);
-  const [downloadUrl, setDownloadUrl] = React.useState("");
-  const [hotReloading, setHotReloading] = React.useState(true);
-  const [renderNow, setRenderNow] = React.useState({ value: false });
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [firstLoad, setFirstLoad] = React.useState(true);
-  const [renderTime, setRenderTime] = React.useState("");
+    useState(false);
+  const [convertOutput, setConvertOutput] = useState(false);
+  const [resizeOutput, setResizeOutput] = useState(false);
+  const [transparentBackground, setTransparentBackground] = useState(false);
+  const [colorPaletteCount, setColorPaletteCount] = useState(0);
+  const [downloadUrl, setDownloadUrl] = useState("");
+  const [hotReloading, setHotReloading] = useState(true);
+  const [renderNow, setRenderNow] = useState({ value: false });
+  const [isLoading, setIsLoading] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [renderTime, setRenderTime] = useState("");
   const reRenderMs = firstLoad ? 0 : 1500;
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       setImages(await loadImages(IMAGE_PATHS));
       const sampleImage = await loadImages([SAMPLE_IMAGE_PATH]);
@@ -306,12 +305,12 @@ export default function Home() {
     setMaskColor(color);
   };
 
-  const debouncedMaskColorHandler = React.useMemo(
+  const debouncedMaskColorHandler = useMemo(
     () => _.debounce(handleSetMaskColor, 500),
     []
   );
 
-  const debouncedBackgroundColorHandler = React.useMemo(
+  const debouncedBackgroundColorHandler = useMemo(
     () => _.debounce(handleSetBackgroundColor, 500),
     []
   );
