@@ -220,7 +220,7 @@ export default function Home() {
           // similar to using setTimeout with a delay of 0. Useful for performing
           // expensive computations or HTML rendering in chunks without blocking
           // the UI thread from updating.
-          _.defer(() => {
+          _.defer(async () => {
             const startTime = performance.now();
 
             const colorPalette = texturize(
@@ -240,19 +240,17 @@ export default function Home() {
             if (resizeOutput)
               resize(canvas, transparentBackground, backgroundColor);
 
-            setColorPaletteCount(colorPalette.length);
             if (convertOutput) {
-              (async () => {
-                await convertOutputToIndexedPng(
-                  canvas,
-                  terrain.index,
-                  colorPalette,
-                  setDownloadUrl
-                );
-              })();
+              await convertOutputToIndexedPng(
+                canvas,
+                terrain.index,
+                colorPalette,
+                setDownloadUrl
+              );
             } else {
               setDownloadUrl(canvas.toDataURL("image/png"));
             }
+            setColorPaletteCount(colorPalette.length);
 
             const endTime = performance.now();
             setRenderTime(convertMsToTime(endTime - startTime));
