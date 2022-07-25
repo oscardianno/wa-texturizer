@@ -114,16 +114,15 @@ export function texturize(
     setPixelRow(imageData, y, lastPixelRow, MAX_GRASS_HEIGHT);
   }
 
-  let colorPalette: rgbaColor[] = [];
+  let bgColor: rgbaColor;
+  let colorPalette: Record<string, rgbaColor> = {};
   // Prepare the colorPalette (if necessary)
   if (convertOutput) {
     // Add the colors from texture images
     colorPalette = TERRAIN_TEXTURES_COLOR_PALETTES[terrain];
-    // Add the backgroundColor as the first in palette
-    const bgColor: rgbaColor = transparentBackground
-      ? [0, 0, 0, 0]
-      : hexToRgb(backgroundColor);
-    setFirstColorInPalette(bgColor, colorPalette);
+    // Store to later add the backgroundColor as the first in palette
+    bgColor = transparentBackground ? [0, 0, 0, 0] : hexToRgb(backgroundColor);
+    // setFirstColorInPalette(bgColor, colorPalette);
   }
 
   // Texturization begins - scans horizontally in X from left to right
@@ -167,7 +166,7 @@ export function texturize(
         below = grassImage.height - grassBottomOffset - 1;
 
         // Add sourceColor to colorPalette (if it isn't present yet)
-        if (convertOutput) checkAndAddToColorPalette(sourceColor, colorPalette);
+        if (convertOutput) addToColorPalette(sourceColor, colorPalette);
       }
     }
 
@@ -206,7 +205,15 @@ export function texturize(
     cropCanvas(canvas, ctx, sourceImage.width, originalHeight, heightOffset);
   }
 
-  return colorPalette;
+  if (!convertOutput) {
+    return [];
+  } else {
+    console.time("convert");
+    const colorPaletteArray = Object.values(colorPalette);
+    setFirstColorInPaletteArray(bgColor, colorPaletteArray);
+    console.timeEnd("convert");
+    return colorPaletteArray;
+  }
 }
 
 export function resize(
@@ -237,33 +244,30 @@ export function resize(
   ctx.putImageData(imageData, dx, dy);
 }
 
-export function convertOutputToIndexedPng(
+export async function convertOutputToIndexedPng(
   canvas: HTMLCanvasElement,
   terrainIndex: number,
   colorPalette: rgbaColor[],
   setDownloadUrl: Function
 ) {
-  canvas.toBlob(
-    async function (blob) {
-      // Encode PNG with indexed color palette
-      let metadata = png.decode(await blob.arrayBuffer());
-      metadata.colorType = COLOR_TYPES.PALETTE;
-      metadata.palette = colorPalette;
-      metadata.interlace = 0;
-      let imageBuffer = png.encode(metadata);
-      // Write W:A extra PNG chunk
-      const walvChunk = composeWalvChunk(terrainIndex);
-      const pngChunks: PngChunk[] = getChunks(imageBuffer);
-      // Insert as the 3rd chunk
-      pngChunks.splice(1, 0, walvChunk);
-      imageBuffer = toPNG(pngChunks);
-      // Generate file URL
-      const fileBlob = new Blob([imageBuffer], { type: "image/png" });
-      setDownloadUrl(URL.createObjectURL(fileBlob));
-    },
-    "image/png",
-    1
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/png", 1)
   );
+  // Encode PNG with indexed color palette
+  let metadata = png.decode(await blob.arrayBuffer());
+  metadata.colorType = COLOR_TYPES.PALETTE;
+  metadata.palette = colorPalette;
+  metadata.interlace = 0;
+  let imageBuffer = png.encode(metadata);
+  // Write W:A extra PNG chunk
+  const walvChunk = composeWalvChunk(terrainIndex);
+  const pngChunks: PngChunk[] = getChunks(imageBuffer);
+  // Insert as the 3rd chunk
+  pngChunks.splice(1, 0, walvChunk);
+  imageBuffer = toPNG(pngChunks);
+  // Generate file URL
+  const fileBlob = new Blob([imageBuffer], { type: "image/png" });
+  setDownloadUrl(URL.createObjectURL(fileBlob));
 }
 
 // Creates and returns a HTMLCanvasElement out of a HTMLImageElement
@@ -373,7 +377,10 @@ function closeToBlack([r, g, b]: rgbaColor): boolean {
   return r < 40 && g < 40 && b < 40;
 }
 
-function setFirstColorInPalette(color: rgbaColor, colorPalette: rgbaColor[]) {
+function setFirstColorInPaletteArray(
+  color: rgbaColor,
+  colorPalette: rgbaColor[]
+) {
   for (let i = 0, length = colorPalette.length; i < length; i++) {
     if (colorEqual(color, colorPalette[i])) {
       if (i === 0) return;
@@ -384,7 +391,7 @@ function setFirstColorInPalette(color: rgbaColor, colorPalette: rgbaColor[]) {
   colorPalette.unshift(color);
 }
 
-function checkAndAddToColorPalette(
+function checkAndAddToColorPaletteArray(
   color: rgbaColor,
   colorPalette: rgbaColor[]
 ) {
@@ -395,6 +402,14 @@ function checkAndAddToColorPalette(
     }
   }
   colorPalette.push(color);
+}
+
+function addToColorPalette(
+  color: rgbaColor,
+  colorPalette: Record<string, rgbaColor>
+) {
+  const colorString = `${color[0]}-${color[1]}-${color[2]}`;
+  colorPalette[colorString] = color;
 }
 
 function findNextValidDimension(n: number): number {

@@ -242,12 +242,14 @@ export default function Home() {
 
             setColorPaletteCount(colorPalette.length);
             if (convertOutput) {
-              convertOutputToIndexedPng(
-                canvas,
-                terrain.index,
-                colorPalette,
-                setDownloadUrl
-              );
+              (async () => {
+                await convertOutputToIndexedPng(
+                  canvas,
+                  terrain.index,
+                  colorPalette,
+                  setDownloadUrl
+                );
+              })();
             } else {
               setDownloadUrl(canvas.toDataURL("image/png"));
             }
@@ -494,6 +496,10 @@ export default function Home() {
                 setRenderNow,
                 renderTime
               )}
+            <br />
+            <span id="render-time">
+              <b>Version:</b> using object color palettes.
+            </span>
           </div>
         </div>
 
