@@ -434,7 +434,8 @@ export default function Home() {
                       <b>4000*4000px</b>.
                       <br />
                       <br />
-                      {"In such cases, use some image editor — "}
+                      {"In such cases, download your texturized map" +
+                        " and use some image editor — "}
                       <span className="highlight">click icon </span>
                       to learn how.
                     </span>
