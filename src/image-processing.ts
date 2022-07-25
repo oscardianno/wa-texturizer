@@ -234,33 +234,30 @@ export function resize(
   ctx.putImageData(imageData, dx, dy);
 }
 
-export function convertOutputToIndexedPng(
+export async function convertOutputToIndexedPng(
   canvas: HTMLCanvasElement,
   terrainIndex: number,
   colorPalette: Color[],
   setDownloadUrl: Function
 ) {
-  canvas.toBlob(
-    async function (blob) {
-      // Encode PNG with indexed color palette
-      let metadata = png.decode(await blob.arrayBuffer());
-      metadata.colorType = COLOR_TYPES.PALETTE;
-      metadata.palette = colorPalette;
-      metadata.interlace = 0;
-      let imageBuffer = png.encode(metadata);
-      // Write W:A extra PNG chunk
-      const walvChunk = composeWalvChunk(terrainIndex);
-      const pngChunks: PngChunk[] = getChunks(imageBuffer);
-      // Insert as the 3rd chunk
-      pngChunks.splice(1, 0, walvChunk);
-      imageBuffer = toPNG(pngChunks);
-      // Generate file URL
-      const fileBlob = new Blob([imageBuffer], { type: "image/png" });
-      setDownloadUrl(URL.createObjectURL(fileBlob));
-    },
-    "image/png",
-    1
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/png", 1)
   );
+  // Encode PNG with indexed color palette
+  let metadata = png.decode(await blob.arrayBuffer());
+  metadata.colorType = COLOR_TYPES.PALETTE;
+  metadata.palette = colorPalette;
+  metadata.interlace = 0;
+  let imageBuffer = png.encode(metadata);
+  // Write W:A extra PNG chunk
+  const walvChunk = composeWalvChunk(terrainIndex);
+  const pngChunks: PngChunk[] = getChunks(imageBuffer);
+  // Insert as the 3rd chunk
+  pngChunks.splice(1, 0, walvChunk);
+  imageBuffer = toPNG(pngChunks);
+  // Generate file URL
+  const fileBlob = new Blob([imageBuffer], { type: "image/png" });
+  setDownloadUrl(URL.createObjectURL(fileBlob));
 }
 
 // Creates and returns a HTMLCanvasElement out of a HTMLImageElement

@@ -242,12 +242,14 @@ export default function Home() {
 
             setColorPaletteCount(colorPalette.length);
             if (convertOutput) {
-              convertOutputToIndexedPng(
-                canvas,
-                terrain.index,
-                colorPalette,
-                setDownloadUrl
-              );
+              (async () => {
+                await convertOutputToIndexedPng(
+                  canvas,
+                  terrain.index,
+                  colorPalette,
+                  setDownloadUrl
+                );
+              })();
             } else {
               setDownloadUrl(canvas.toDataURL("image/png"));
             }
