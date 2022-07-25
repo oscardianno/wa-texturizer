@@ -14,13 +14,14 @@
     "@types/react-router-dom": "^5.1.8",
     "@vivaxy/png": "^1.3.0",
     "lodash": "^4.17.21",
-    "next": "11.1.2",
+    "next": "^12.2.3",
     "png-chunks": "^1.0.0",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "typescript": "^4.4.2"
   },
   "devDependencies": {
+    "@types/node": "^18.6.1",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.2"
   }
