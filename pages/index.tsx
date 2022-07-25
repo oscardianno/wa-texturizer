@@ -95,6 +95,17 @@ function useQueryParam(
   ];
 }
 
+function getWarningIcon(text: string, url: string) {
+  return (
+    <a href={url} target="_blank" rel="noreferrer">
+      <span className="tooltip warning-icon">
+        <span className="tooltip-text">{text}</span>
+        ⚠️
+      </span>
+    </a>
+  );
+}
+
 function getButtonSection(
   downloadUrl: string,
   hotReloading: boolean,
@@ -412,6 +423,24 @@ export default function Home() {
                   onChange={(e) => handleSetConvertOutput(e.target.checked)}
                 />
                 Convert output for W:A compatibility
+                <a
+                  href="https://worms2d.info/Colour_map#Authoring_instructions"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="tooltip warning-icon">
+                    <span className="tooltip-text">
+                      {"Not recommended to use in maps larger than "}
+                      <b>4000*4000px</b>.
+                      <br />
+                      <br />
+                      {"In such cases, use some image editor — "}
+                      <span className="highlight">click icon </span>
+                      to learn how.
+                    </span>
+                    ⚠️
+                  </span>
+                </a>
               </label>
               <label>
                 <input
@@ -467,21 +496,27 @@ export default function Home() {
               checked={hotReloading}
               onChange={(e) => setHotReloading(e.target.checked)}
             />
-            <label htmlFor="hot-reload">Enable hot reloading</label>
-            <span className="tooltip">
-              <span className="tooltip-text">
-                Automatically re-render the map as options are changed
+            <div className="inline-container">
+              <label htmlFor="hot-reload">Enable hot reloading</label>
+              <span className="tooltip circle">
+                <span className="tooltip-text">
+                  Automatically re-render the map as options are changed. <br />
+                  <br />
+                  Not recommended on large maps.
+                </span>
+                ?
               </span>
-              ?
-            </span>
-            <div className="loading-icon-container">
-              <picture>
-                <img
-                  className={`canvas loading-icon ${isLoading ? "active" : ""}`}
-                  src="/arrowsdr.gif"
-                  alt="Animated loading icon"
-                />
-              </picture>
+              <div className="inline-container">
+                <picture>
+                  <img
+                    className={`canvas loading-icon ${
+                      isLoading ? "active" : ""
+                    }`}
+                    src="/arrowsdr.gif"
+                    alt="Animated loading icon"
+                  />
+                </picture>
+              </div>
             </div>
             <br />
             <br />
