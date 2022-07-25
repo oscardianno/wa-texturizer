@@ -349,8 +349,8 @@ function setPixelRow(
   }
 }
 
-function colorEqual(c1: Color, c2: Color): boolean {
-  return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2];
+function colorEqual(a: Color, b: Color): boolean {
+  return a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
 }
 
 function closeToBlack([r, g, b]: Color): boolean {
