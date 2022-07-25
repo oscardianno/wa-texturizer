@@ -190,8 +190,8 @@ export default function Home() {
   const [transparentBackground, setTransparentBackground] = useState(false);
   const [colorPaletteCount, setColorPaletteCount] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState("");
-  const [hotReloading, setHotReloading] = useState(true);
-  const [renderNow, setRenderNow] = useState({ value: false });
+  const [hotReloading, setHotReloading] = useState(false);
+  const [renderNow, setRenderNow] = useState({ value: true });
   const [isLoading, setIsLoading] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
   const [renderTime, setRenderTime] = useState("");
