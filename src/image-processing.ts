@@ -4,14 +4,18 @@ import { getChunks, toPNG } from "png-chunks";
 import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
 import { TERRAIN_TEXTURES_COLOR_PALETTES } from "./pre-computed-data";
 
-const MAX_GRASS_HEIGHT = 64;
 const MIN_MAP_WIDTH = 640;
 const MIN_MAP_HEIGHT = 32;
+const MAX_GRASS_HEIGHT = 64;
+const GRASS_WIDTH = 64;
 
+// PNG waLV chunk: sets the Soil Texture Index
+// as version 1 -> compatibility from v3.6.26.4
 const SOIL_SIGNED_VERSION = 1;
 
 // Each pixel is a 4-byte value - "RGBA" format (RGB + alpha)
-type Color = [r: number, g: number, b: number, a: number];
+type rgbaColor = [r: number, g: number, b: number, a: number];
+type rgbColor = [r: number, g: number, b: number];
 
 type PngChunk = {
   chunkType: string;
@@ -33,7 +37,7 @@ export function texturize(
   convertOutput: boolean,
   transparentBackground: boolean,
   backgroundColor: string
-): Color[] {
+): rgbaColor[] {
   const maskColor = hexToRgb(maskColorString);
   const originalHeight = sourceImage.height;
   const renderHeight =
@@ -65,17 +69,16 @@ export function texturize(
 
   // Grass files have 64 width for each top and bottom parts
   const grassContext = getContext(grassImage);
-  const grassWidth = 64;
   const grassTopImageData = grassContext.getImageData(
     0,
     0,
-    grassWidth,
+    GRASS_WIDTH,
     grassImage.height
   );
   const grassBottomImageData = grassContext.getImageData(
-    grassWidth,
+    GRASS_WIDTH,
     0,
-    grassWidth,
+    GRASS_WIDTH,
     grassImage.height
   );
 
@@ -84,7 +87,7 @@ export function texturize(
   // By checking each pixel in 'y' until it's color is not close-to-black
   let grassTopOffset = 0;
   for (let y = 0, height = grassImage.height; y < height; y++) {
-    if (!closeToBlack(getPixel(grassTopImageData, 0, y))) {
+    if (!closeToBlack(getRgbaPixel(grassTopImageData, 0, y))) {
       break;
     }
     grassTopOffset++;
@@ -92,7 +95,7 @@ export function texturize(
 
   let grassBottomOffset = 0;
   for (let y = grassImage.height - 1; y >= 0; y--) {
-    if (!closeToBlack(getPixel(grassBottomImageData, 0, y))) {
+    if (!closeToBlack(getRgbaPixel(grassBottomImageData, 0, y))) {
       break;
     }
     grassBottomOffset++;
@@ -111,13 +114,13 @@ export function texturize(
     setPixelRow(imageData, y, lastPixelRow, MAX_GRASS_HEIGHT);
   }
 
-  let colorPalette: Color[] = [];
+  let colorPalette: rgbaColor[] = [];
   // Prepare the colorPalette (if necessary)
   if (convertOutput) {
     // Add the colors from texture images
     colorPalette = TERRAIN_TEXTURES_COLOR_PALETTES[terrain];
     // Add the backgroundColor as the first in palette
-    const bgColor: Color = transparentBackground
+    const bgColor: rgbaColor = transparentBackground
       ? [0, 0, 0, 0]
       : hexToRgb(backgroundColor);
     setFirstColorInPalette(bgColor, colorPalette);
@@ -130,24 +133,24 @@ export function texturize(
     // Scan vertically in Y from down to up (to apply grassBottom)
     for (let y = renderHeight - 1; y >= 0; y--) {
       // Get the pixel color in x/y position of the sourceImage data
-      const sourceColor = getPixel(imageData, x, y);
+      const sourceColor = getRgbaPixel(imageData, x, y);
       // If color in pixel is maskColor, texturize it
       if (colorEqual(sourceColor, maskColor)) {
-        let color: Color;
+        let color: rgbaColor;
         // 'below' decreases as grass-bottom is applied (as if the height was consumed)
         // So if value still >=0, there's still grass-bottom pixels to be applied
         if (below >= 0) {
           // Texturize with grass-bottom
-          // Get the pixel from grassBottom, x % grassWidth because it's treated
+          // Get the pixel from grassBottom, x % GRASS_WIDTH because it's treated
           // as a pattern that repeats itself.
-          color = getPixel(grassBottomImageData, x % grassWidth, below);
+          color = getRgbaPixel(grassBottomImageData, x % GRASS_WIDTH, below);
         }
 
         // If grass-bottom has been applied completely, color would be falsey
         // color could also be close to black, which would also mean that we finished
         // applying grass-bottom. If so, then we will texturize with texture.
         if (!color || closeToBlack(color)) {
-          color = getPixel(
+          color = getRgbaPixel(
             textImageData,
             x % textImage.width,
             y % textImage.height
@@ -172,16 +175,16 @@ export function texturize(
     let above = 0; // which is 0
     // Scan vertically in Y from up to down (to apply grassTop)
     for (let y = 0; y < renderHeight; y++) {
-      const sourceColor = getPixel(imageData, x, y);
+      const sourceColor = getRgbaPixel(imageData, x, y);
       if (colorEqual(sourceColor, maskColor)) {
         // 'above' increases as grass-top is applied (as if the height was filled)
         // So if value is smaller than the height of grass-top pixels to apply,
         // there's still pixels to be applied
         if (above < grassImage.height - grassTopOffset) {
           // Texturize with grass-top...
-          const color = getPixel(
+          const color = getRgbaPixel(
             grassTopImageData,
-            x % grassWidth,
+            x % GRASS_WIDTH,
             above + grassTopOffset
           );
           // ...as long as it's not a close-to-black color
@@ -237,7 +240,7 @@ export function resize(
 export function convertOutputToIndexedPng(
   canvas: HTMLCanvasElement,
   terrainIndex: number,
-  colorPalette: Color[],
+  colorPalette: rgbaColor[],
   setDownloadUrl: Function
 ) {
   canvas.toBlob(
@@ -306,18 +309,18 @@ function cropCanvas(
   ctx.putImageData(croppedImageData, 0, 0);
 }
 
-function hexToRgb(hex: string): Color {
+function hexToRgb(hex: string): rgbaColor {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (result) {
     const [match, r, g, b] = result;
-    return [...[r, g, b].map((s) => parseInt(s, 16)), 255] as Color;
+    return [...[r, g, b].map((s) => parseInt(s, 16)), 255] as rgbaColor;
   } else {
     return null;
   }
 }
 
 // Returns the color of a pixel in an ImageData
-function getPixel(imgData: ImageData, x: number, y: number): Color {
+function getRgbaPixel(imgData: ImageData, x: number, y: number): rgbaColor {
   /* ImageData can be seen as an array with all the pixels
   We find the index by multiplying 'y * imgWidth' and that's the position
   of the pixel in the 'y' row we're in,
@@ -325,16 +328,26 @@ function getPixel(imgData: ImageData, x: number, y: number): Color {
   const index = y * imgData.width + x;
   // Then we multiply the index * 4, because each color is made of 4 values
   // (RGBA), and we slice 4 elements to get the color.
-  return imgData.data.slice(index * 4, index * 4 + 4) as unknown as Color;
+  return imgData.data.slice(index * 4, index * 4 + 4) as unknown as rgbaColor;
+}
+function getRgbPixel(imgData: ImageData, x: number, y: number): rgbColor {
+  /* ImageData can be seen as an array with all the pixels
+  We find the index by multiplying 'y * imgWidth' and that's the position
+  of the pixel in the 'y' row we're in,
+  then we just sum the 'x' value. */
+  const index = y * imgData.width + x;
+  // Then we multiply the index * 4, because each color is made of 4 values
+  // (RGBA), but we slice only 3 elements to get the color without the Alias value.
+  return imgData.data.slice(index * 4, index * 4 + 3) as unknown as rgbColor;
 }
 
 // Sets the color of a pixel in an ImageData
-function setPixel(imgData: ImageData, x: number, y: number, color: Color) {
+function setPixel(imgData: ImageData, x: number, y: number, color: rgbaColor) {
   const index = y * imgData.width + x;
   imgData.data.set(color, index * 4);
 }
 
-function getPixelRow(imgData: ImageData, y: number): Color[] {
+function getPixelRow(imgData: ImageData, y: number): rgbaColor[] {
   const rowLengthInBytes = imgData.width * 4;
   const index = y * rowLengthInBytes;
   return imgData.data.slice(index, index + rowLengthInBytes) as unknown as any;
@@ -343,7 +356,7 @@ function getPixelRow(imgData: ImageData, y: number): Color[] {
 function setPixelRow(
   imgData: ImageData,
   y: number,
-  row: Color[],
+  row: rgbaColor[],
   numberOfRows: number = 1
 ) {
   const rowLengthInBytes = imgData.width * 4;
@@ -352,15 +365,15 @@ function setPixelRow(
   }
 }
 
-function colorEqual(c1: Color, c2: Color): boolean {
+function colorEqual(c1: rgbaColor, c2: rgbaColor): boolean {
   return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2];
 }
 
-function closeToBlack([r, g, b]: Color): boolean {
+function closeToBlack([r, g, b]: rgbaColor): boolean {
   return r < 40 && g < 40 && b < 40;
 }
 
-function setFirstColorInPalette(color: Color, colorPalette: Color[]) {
+function setFirstColorInPalette(color: rgbaColor, colorPalette: rgbaColor[]) {
   for (let i = 0, length = colorPalette.length; i < length; i++) {
     if (colorEqual(color, colorPalette[i])) {
       if (i === 0) return;
@@ -371,7 +384,10 @@ function setFirstColorInPalette(color: Color, colorPalette: Color[]) {
   colorPalette.unshift(color);
 }
 
-function checkAndAddToColorPalette(color: Color, colorPalette: Color[]) {
+function checkAndAddToColorPalette(
+  color: rgbaColor,
+  colorPalette: rgbaColor[]
+) {
   // Check if the color isn't already in the colorPalette
   for (let i = 0, length = colorPalette.length; i < length; i++) {
     if (colorEqual(color, colorPalette[i])) {
@@ -411,4 +427,43 @@ function composeWalvChunk(terrainIndex: number): PngChunk {
     data: chunkData,
     length: 41,
   };
+}
+
+export function getTerrainColorPalette(
+  textImage: HTMLImageElement,
+  grassImage: HTMLImageElement
+) {
+  const textContext = getContext(textImage);
+  const textImageData = textContext.getImageData(
+    0,
+    0,
+    textImage.width,
+    textImage.height
+  );
+  const grassContext = getContext(grassImage);
+  const grassImageData = grassContext.getImageData(
+    0,
+    0,
+    grassImage.width,
+    grassImage.height
+  );
+
+  let colorPalette: Record<string, rgbaColor> = {};
+  // Scan texture imageData
+  for (let x = 0, width = textImage.width; x < width; x++) {
+    for (let y = 0, height = textImage.height; y < height; y++) {
+      const sourceColor = getRgbaPixel(textImageData, x, y);
+      const colorString = `${sourceColor[0]}-${sourceColor[1]}-${sourceColor[2]}`;
+      colorPalette[colorString] = sourceColor;
+    }
+  }
+  // Scan grass imageData
+  for (let x = 0, width = grassImage.width; x < width; x++) {
+    for (let y = 0, height = grassImage.height; y < height; y++) {
+      const sourceColor = getRgbaPixel(grassImageData, x, y);
+      const colorString = `${sourceColor[0]}-${sourceColor[1]}-${sourceColor[2]}`;
+      colorPalette[colorString] = sourceColor;
+    }
+  }
+  return colorPalette;
 }
