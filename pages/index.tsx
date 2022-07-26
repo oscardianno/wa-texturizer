@@ -347,8 +347,8 @@ export default function Home() {
             <i>
               <b>pixel-perfect</b>
             </i>{" "}
-            maps for <b className="game">Worms: Armageddon</b> with the game's
-            terrain textures!
+            maps for <b className="game">Worms: Armageddon</b> with the
+            game&apos;s terrain textures!
           </p>
         </div>
       </header>
