@@ -527,7 +527,6 @@ export default function Home() {
               </picture>
             </div>
             <br />
-            <br />
             {!!sourceImage &&
               getButtonSection(
                 downloadUrl,
