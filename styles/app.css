@@ -207,6 +207,7 @@ canvas {
   color: white;
   font-weight: normal;
   font-size: medium;
+  text-shadow: 1px 1px 4px black;
   background-color: #555;
   text-align: center;
   width: 275px;
