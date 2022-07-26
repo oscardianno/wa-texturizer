@@ -50,7 +50,7 @@ canvas {
   border-radius: 6px;
 }
 
-.loading-icon-container {
+.inline-container {
   display: inline-block;
 }
 
@@ -169,6 +169,13 @@ canvas {
   position: relative;
   display: inline-block;
   margin-left: 8px;
+}
+
+.tooltip.warning-icon {
+  margin-left: 2px;
+}
+
+.tooltip.circle {
   border-radius: 100px;
   padding: 1px 6px;
   border: 2px dotted white;
@@ -177,15 +184,18 @@ canvas {
 .tooltip .tooltip-text {
   visibility: hidden;
   color: white;
+  font-weight: normal;
+  font-size: medium;
   background-color: #555;
   text-align: center;
-  width: 170px;
-  border-radius: 2px;
-  padding: 5px 10px;
+  width: 275px;
+  border: 2px solid #808080;
+  border-radius: 8px;
+  padding: 10px 10px;
   position: absolute;
   bottom: 150%;
   left: 50%;
-  margin-left: -70px;
+  margin-left: -75px;
   z-index: 1;
   opacity: 0;
   transition: opacity 0.3s;
