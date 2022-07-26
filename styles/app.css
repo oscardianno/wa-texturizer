@@ -17,8 +17,29 @@ body {
 
 #logo {
   max-width: 460px;
-  margin-top: 10px;
-  margin-bottom: 15px;
+  margin: 10px 0px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+}
+
+#description {
+  width: 650px;
+  min-height: 50px;
+  padding: 0px 10px;
+  margin-left: 30px;
+  margin-bottom: 3px;
+  align-items: center;
+  border-radius: 8px;
+  text-align: center;
+  text-shadow: 1px 1px 2px black;
+  background-color: #555;
+}
+
+#description .game {
+  color: red;
 }
 
 h3 {

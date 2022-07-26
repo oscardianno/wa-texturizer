@@ -337,10 +337,21 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <meta name="darkreader-lock" />
       </Head>
-      <picture>
-        <img id="logo" src="/texturized-logo.png" alt="W:A texturizer logo" />
-      </picture>
-      <br />
+      <header>
+        <picture>
+          <img id="logo" src="/texturized-logo.png" alt="W:A texturizer" />
+        </picture>
+        <div id="description" className="options">
+          <p>
+            Create{" "}
+            <i>
+              <b>pixel-perfect</b>
+            </i>{" "}
+            maps for <b className="game">Worms: Armageddon</b> with the game's
+            terrain textures!
+          </p>
+        </div>
+      </header>
 
       <div className="container">
         <div className="options vertical container">
@@ -507,17 +518,13 @@ export default function Home() {
                 </span>
                 ?
               </span>
-              <div className="inline-container">
-                <picture>
-                  <img
-                    className={`canvas loading-icon ${
-                      isLoading ? "active" : ""
-                    }`}
-                    src="/arrowsdr.gif"
-                    alt="Animated loading icon"
-                  />
-                </picture>
-              </div>
+              <picture>
+                <img
+                  className={`canvas loading-icon ${isLoading ? "active" : ""}`}
+                  src="/arrowsdr.gif"
+                  alt="Animated loading icon"
+                />
+              </picture>
             </div>
             <br />
             <br />
