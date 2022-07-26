@@ -4,10 +4,13 @@ import { getChunks, toPNG } from "png-chunks";
 import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
 import { TERRAIN_TEXTURES_COLOR_PALETTES } from "./pre-computed-data";
 
-const MAX_GRASS_HEIGHT = 64;
 const MIN_MAP_WIDTH = 640;
 const MIN_MAP_HEIGHT = 32;
+const MAX_GRASS_HEIGHT = 64;
+const GRASS_WIDTH = 64;
 
+// PNG waLV chunk: sets the Soil Texture Index
+// as version 1 -> compatibility from v3.6.26.4
 const SOIL_SIGNED_VERSION = 1;
 
 // Each pixel is a 4-byte value - "RGBA" format (RGB + alpha)
@@ -65,17 +68,16 @@ export function texturize(
 
   // Grass files have 64 width for each top and bottom parts
   const grassContext = getContext(grassImage);
-  const grassWidth = 64;
   const grassTopImageData = grassContext.getImageData(
     0,
     0,
-    grassWidth,
+    GRASS_WIDTH,
     grassImage.height
   );
   const grassBottomImageData = grassContext.getImageData(
-    grassWidth,
+    GRASS_WIDTH,
     0,
-    grassWidth,
+    GRASS_WIDTH,
     grassImage.height
   );
 
@@ -138,9 +140,9 @@ export function texturize(
         // So if value still >=0, there's still grass-bottom pixels to be applied
         if (below >= 0) {
           // Texturize with grass-bottom
-          // Get the pixel from grassBottom, x % grassWidth because it's treated
+          // Get the pixel from grassBottom, x % GRASS_WIDTH because it's treated
           // as a pattern that repeats itself.
-          color = getPixel(grassBottomImageData, x % grassWidth, below);
+          color = getPixel(grassBottomImageData, x % GRASS_WIDTH, below);
         }
 
         // If grass-bottom has been applied completely, color would be falsey
@@ -181,7 +183,7 @@ export function texturize(
           // Texturize with grass-top...
           const color = getPixel(
             grassTopImageData,
-            x % grassWidth,
+            x % GRASS_WIDTH,
             above + grassTopOffset
           );
           // ...as long as it's not a close-to-black color
