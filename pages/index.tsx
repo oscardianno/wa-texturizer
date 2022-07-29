@@ -463,6 +463,16 @@ export default function Home() {
                   onChange={(e) => setResizeOutput(e.target.checked)}
                 />
                 Resize output to valid W:A map dimensions
+                <span className="tooltip circle">
+                  <span className="tooltip-text">
+                    W:A requires both image dimensions to be divisible by 8.
+                    <br />
+                    <br />
+                    {"This won't stretch your map, but will add transparent space " +
+                      "at sides and top if needed."}
+                  </span>
+                  ?
+                </span>
               </label>
               {resizeOutput && (
                 <div className="indented-options">
