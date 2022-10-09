@@ -3,9 +3,9 @@
 <p align="center">Create pixel-perfect maps for <b>Worms: Armageddon</b> with the game's terrain textures</p>
 
 <p align="justify">
-The purpose of this app is to allow you to create maps that look W:A generated; in the style of the classic terrains, but keeping them pixel-perfect. This means that transparent pixels will always stay transparent, so that you can create precise race maps that will still work as they were meant to after the textures are applied. In addition, the app can automatically convert the output file to make it straight-forward compatible with the game, by encoding the PNG file with an 8-bit indexed color palette and writing the game's special PNG chunk.
+A lightweight web program for making maps that seem like they were created in W:A, in the original terrain style but with precise pixel placement. This ensures that your board/trick/race maps maintain their intended functionality after applying textures, since transparent pixels will always remain translucent. In addition, the app can automatically convert the output file to make it straight-forward compatible with the game, by encoding the PNG file with an 8-bit indexed color palette and writing the game's special PNG chunk.
 
-Also, the application style was designed to follow W:A's graphical interfaces style :))
+The application design is meant to follow W:A's graphical interfaces style :))
 
 </p>
 
