@@ -1,7 +1,7 @@
-import _ from "lodash";
 import * as png from "@vivaxy/png";
-import { getChunks, toPNG } from "png-chunks";
 import { COLOR_TYPES } from "@vivaxy/png/lib/helpers/color-types";
+import _ from "lodash";
+import { getChunks, toPNG } from "png-chunks";
 import { TERRAIN_TEXTURES_COLOR_PALETTES } from "./pre-computed-data";
 
 const MIN_MAP_WIDTH = 640;
@@ -35,7 +35,8 @@ export function texturize(
   dontDrawGrassOnLowerBorder: boolean,
   convertOutput: boolean,
   transparentBackground: boolean,
-  backgroundColor: string
+  backgroundColor: string,
+  printPureTerrainColorPalette = false
 ): Color[] {
   const maskColor = hexToRgb(maskColorString);
   const originalHeight = sourceImage.height;
@@ -123,6 +124,24 @@ export function texturize(
       ? [0, 0, 0, 0]
       : hexToRgb(backgroundColor);
     setFirstColorInPalette(bgColor, colorPalette);
+  }
+
+  // Use this function to generate pre-computed-data for new terrains
+  if (printPureTerrainColorPalette) {
+    const pureTerrainColorPalette = generateTerrainTexturesPalette(
+      hexToRgb(backgroundColor),
+      [textImageData, grassTopImageData, grassBottomImageData]
+    );
+    for (let i = 0; i < pureTerrainColorPalette.length; i++) {
+      // Check if color is number array or object
+      const color = pureTerrainColorPalette[i];
+      if (!Array.isArray(color)) {
+        const colorArray = Object.values(color);
+        pureTerrainColorPalette[i] = colorArray as Color;
+      }
+    }
+    console.log(JSON.stringify(pureTerrainColorPalette));
+    console.log(pureTerrainColorPalette.length);
   }
 
   // Texturization begins - scans horizontally in X from left to right
@@ -410,4 +429,21 @@ function composeWalvChunk(terrainIndex: number): PngChunk {
     data: chunkData,
     length: 41,
   };
+}
+
+export function generateTerrainTexturesPalette(
+  bgColor: Color,
+  texturesArray: ImageData[]
+) {
+  const colorPalette: Color[] = [bgColor];
+  for (let i = 0; i < texturesArray.length; i++) {
+    const texture = texturesArray[i];
+    for (let x = 0; x < texture.width; x++) {
+      for (let y = 0; y < texture.height; y++) {
+        checkAndAddToColorPalette(getPixel(texture, x, y), colorPalette);
+      }
+    }
+  }
+
+  return colorPalette;
 }
