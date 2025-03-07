@@ -1,13 +1,13 @@
-import Head from "next/head";
-import React, { useState, useEffect, useMemo } from "react";
 import _ from "lodash";
-import {
-  texturize,
-  resize,
-  convertOutputToIndexedPng,
-} from "./../src/image-processing";
+import Head from "next/head";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDebouncedEffect } from "../src/hooks";
 import { convertMsToTime } from "../src/utils";
+import {
+  convertOutputToIndexedPng,
+  resize,
+  texturize,
+} from "./../src/image-processing";
 
 // TERRAINS defines the terrain options that will be available through the app
 const TERRAINS = [
