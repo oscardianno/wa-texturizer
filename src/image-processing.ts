@@ -120,10 +120,11 @@ export function texturize(
     // Add the colors from texture images
     colorPalette = TERRAIN_TEXTURES_COLOR_PALETTES[terrain];
     // Add the backgroundColor as the first in palette
-    const bgColor: Color = transparentBackground
-      ? [0, 0, 0, 0]
-      : hexToRgb(backgroundColor);
-    setFirstColorInPalette(bgColor, colorPalette);
+    if (transparentBackground) {
+      setFirstColorInPalette([0, 0, 0, 0], colorPalette, true);
+    } else {
+      setFirstColorInPalette(hexToRgb(backgroundColor), colorPalette);
+    }
   }
 
   // Use this function to generate pre-computed-data for new terrains
@@ -378,7 +379,16 @@ function closeToBlack([r, g, b]: Color): boolean {
   return r < 40 && g < 40 && b < 40;
 }
 
-function setFirstColorInPalette(color: Color, colorPalette: Color[]) {
+function setFirstColorInPalette(
+  color: Color,
+  colorPalette: Color[],
+  skipCheck = false
+) {
+  if (skipCheck) {
+    colorPalette.unshift(color);
+    return;
+  }
+
   for (let i = 0, length = colorPalette.length; i < length; i++) {
     if (colorEqual(color, colorPalette[i])) {
       if (i === 0) return;
