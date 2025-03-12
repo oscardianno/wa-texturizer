@@ -35,8 +35,7 @@ export function texturize(
   dontDrawGrassOnLowerBorder: boolean,
   convertOutput: boolean,
   transparentBackground: boolean,
-  backgroundColor: string,
-  printPureTerrainColorPalette = false
+  backgroundColor: string
 ): Color[] {
   const maskColor = hexToRgb(maskColorString);
   const originalHeight = sourceImage.height;
@@ -119,30 +118,20 @@ export function texturize(
   if (convertOutput) {
     // Add the colors from texture images
     colorPalette = TERRAIN_TEXTURES_COLOR_PALETTES[terrain];
+    if (!colorPalette) {
+      colorPalette = generateTerrainTexturesPalette(hexToRgb(backgroundColor), [
+        textImageData,
+        grassTopImageData,
+        grassBottomImageData,
+      ]);
+      printPureTerrainColorPalette(colorPalette);
+    }
     // Add the backgroundColor as the first in palette
     if (transparentBackground) {
       setFirstColorInPalette([0, 0, 0, 0], colorPalette, true);
     } else {
       setFirstColorInPalette(hexToRgb(backgroundColor), colorPalette);
     }
-  }
-
-  // Use this function to generate pre-computed-data for new terrains
-  if (printPureTerrainColorPalette) {
-    const pureTerrainColorPalette = generateTerrainTexturesPalette(
-      hexToRgb(backgroundColor),
-      [textImageData, grassTopImageData, grassBottomImageData]
-    );
-    for (let i = 0; i < pureTerrainColorPalette.length; i++) {
-      // Check if color is number array or object
-      const color = pureTerrainColorPalette[i];
-      if (!Array.isArray(color)) {
-        const colorArray = Object.values(color);
-        pureTerrainColorPalette[i] = colorArray as Color;
-      }
-    }
-    console.log(JSON.stringify(pureTerrainColorPalette));
-    console.log(pureTerrainColorPalette.length);
   }
 
   // Texturization begins - scans horizontally in X from left to right
@@ -456,4 +445,20 @@ export function generateTerrainTexturesPalette(
   }
 
   return colorPalette;
+}
+
+function printPureTerrainColorPalette(colorPalette: Color[]) {
+  for (let i = 0; i < colorPalette.length; i++) {
+    // Check if color is number array or object
+    const color = colorPalette[i];
+    if (!Array.isArray(color)) {
+      const colorArray = Object.values(color);
+      colorPalette[i] = colorArray as Color;
+    }
+  }
+  // This output can be used to generate pre-computed-data for new terrains
+  console.log("Generated color palette:", {
+    palette: JSON.stringify(colorPalette),
+    length: colorPalette.length,
+  });
 }
